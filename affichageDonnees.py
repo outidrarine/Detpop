@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
 
-from utils import getDateFromFilename
+from utils import getDateFromFilename, getPositionOfFilename
 from constructionPsi import compute_sample_pertinence, compute_average_similaritiy
 
 # Spectrogramme
@@ -98,11 +98,16 @@ def present_sampling(sampling_function, nbSamples):
 
 # Indiquer les échantillons sellectionées par dpp dans la courbe des pertinences
 def scatter_over_pertinence(q, dates, indexes=[], nbSounds = 432):
+    
     fig = plt.figure(figsize = (15, 7))
     plt.plot(q['pertinence'])
+    mean_pertinence = np.mean([p[1] for p in q])
+    plt.pause
+    plt.plot([0, len(q)],[mean_pertinence, mean_pertinence])
     for index in indexes:
+        place = getPositionOfFilename('./SoundDatabase', index)
         plt.pause
-        plt.scatter(index, q[index], 50, marker='x', color = 'r')
+        plt.scatter(place, q[place][1], 50, marker='x', color = 'r')
     plt.xticks(np.arange(0, nbSounds, step = 20), dates, rotation = 90)
     plt.ylabel("Pertinence")
     plt.show()
