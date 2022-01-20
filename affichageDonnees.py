@@ -6,6 +6,7 @@ from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
 
 from utils import getDateFromFilename
+from constructionPsi import compute_sample_pertinence, compute_average_similaritiy
 
 
 # Spectrogramme
@@ -71,3 +72,27 @@ def displayPolarSamples(samples):
     plt.title("Répartition temporelle des échantillons")
     plt.legend()
     plt.show()
+
+
+# Affichages d'informations sur un echantillonages
+
+def present_sampling(sampling_function, nbSamples):
+
+    root = './SoundDatabase'
+    samples = sampling_function(nbSamples)
+
+    pertinences = compute_sample_pertinence(samples, root)
+
+
+    print()
+    print("Samples:", samples)
+    print()
+
+    print("Pertinences list:", pertinences['pertinence'])
+    print("Average pertinence:", np.mean(pertinences['pertinence']))
+    print()
+
+    print("Average similarity:", compute_average_similaritiy(samples, root))
+    print()
+
+    displayPolarSamples(samples)
