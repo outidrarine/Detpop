@@ -113,7 +113,7 @@ def scatter_over_pertinence(q, dates, indexes=[], nbSounds = 432):
     plt.show()
 
 # Indiquer les échantillongs sellectionées par dpp dans la courbe des similarités
-def scatter_over_similarity(similarities, dates, indexes=[], nbSounds = 432, ):
+def scatter_over_similarity(similarities, dates, indexes=[], nbSounds = 432 ):
     step = 20
     plt.figure(figsize=(8, 8))
     ax = plt.axes([0, 0.05, 0.9, 0.9 ])
@@ -123,8 +123,9 @@ def scatter_over_similarity(similarities, dates, indexes=[], nbSounds = 432, ):
     plt.xticks(np.arange(0, nbSounds, step = step), dates, rotation = 90)
     plt.yticks(np.arange(0, nbSounds, step = step), dates, rotation = 0)
     for index in indexes:
+        place = getPositionOfFilename('./SoundDatabase', index)
         plt.pause
-        plt.scatter(index, index, 200, marker='x', color = 'r')
+        plt.scatter(place, place, 200, marker='x', color = 'r')
 
     cax = plt.axes([0.95, 0.05, 0.05,0.9 ])
     plt.colorbar(mappable=im, cax=cax)
