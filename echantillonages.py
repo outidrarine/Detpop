@@ -11,7 +11,7 @@ def sampling_pertinence(nbSamples, duration = 5, root = './SoundDatabase', shuff
 
     q = compute_all_pertinence(root, duration)
 
-    samples = [list(q.items())[k][0] for k in range(len(q))][-nbSamples:]
+    samples = q['file'][-nbSamples:]
 
     if shuffling:
         np.random.shuffle(np.array(samples))

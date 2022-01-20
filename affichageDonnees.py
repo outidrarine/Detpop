@@ -4,7 +4,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
-import nbimporter
 
 from utils import getDateFromFilename
 
@@ -56,6 +55,10 @@ def displayPolarSamples(samples):
 
     colors = ['r', 'g', 'b']
     ax = plt.subplot(111, projection='polar')
+    ax.set_theta_zero_location("N")
+    ax.grid(False)
+    ax.set_rmax(1)
+
     for k, day in enumerate(samplesPerDay):
         theta = np.array(samplesPerDay[day]) * 360 / 1440
         ax.plot(theta, np.ones(theta.shape), colors[k] + 'o', label = day)

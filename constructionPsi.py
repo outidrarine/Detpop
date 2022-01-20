@@ -17,17 +17,22 @@ def compute_pertinence(sound, fe):
     q = tfsd(Spec, fn, tn)
     return np.sqrt(q)
 
-def compute_all_pertinence(root, duration = 5):
+def compute_all_pertinence(root, duration = 5, nbSounds = 432):
     
-    q = {}
+    dt = np.dtype([('file', np.unicode_, 64), ('pertinence', np.float64)])
 
+    q = np.zeros((nbSounds), dtype = dt)
+    #q = [['', 0] for k in range(nbSounds)]
+
+    k = 0
     for root, dirnames, filenames in os.walk(root):
             for f in filenames:
                 filename = os.path.join(root, f)
                 sound, fe = getSound(filename, duration)
-                q[f] = compute_pertinence(sound, fe)
-            
-    q = dict(sorted(q.items(), key = lambda x: x[1]))
+                q[k] = f, compute_pertinence(sound, fe)
+                k += 1
+   
+    q.sort(order = 'pertinence')
 
     return q
 
