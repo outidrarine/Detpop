@@ -96,3 +96,32 @@ def present_sampling(sampling_function, nbSamples):
     print()
 
     displayPolarSamples(samples)
+
+# Indiquer les échantillons sellectionées par dpp dans la courbe des pertinences
+def scatter_over_pertinence(q, dates, indexes=[], nbSounds = 432):
+    fig = plt.figure(figsize = (15, 7))
+    plt.plot(q['pertinence'])
+    for index in indexes:
+        plt.pause
+        plt.scatter(index, q[index], 50, marker='x', color = 'r')
+    plt.xticks(np.arange(0, nbSounds, step = 20), dates, rotation = 90)
+    plt.ylabel("Pertinence")
+    plt.show()
+
+# Indiquer les échantillongs sellectionées par dpp dans la courbe des similarités
+def scatter_over_similarity(similarities, dates, indexes=[], nbSounds = 432, ):
+    step = 20
+    plt.figure(figsize=(8, 8))
+    ax = plt.axes([0, 0.05, 0.9, 0.9 ])
+    ax.grid(False)
+    ax.set_title("Similarités")
+    im = ax.imshow((similarities - np.min(similarities))/(np.max(similarities) - np.min(similarities)), cmap = 'viridis')
+    plt.xticks(np.arange(0, nbSounds, step = step), dates, rotation = 90)
+    plt.yticks(np.arange(0, nbSounds, step = step), dates, rotation = 0)
+    for index in indexes:
+        plt.pause
+        plt.scatter(index, index, 200, marker='x', color = 'r')
+
+    cax = plt.axes([0.95, 0.05, 0.05,0.9 ])
+    plt.colorbar(mappable=im, cax=cax)
+    plt.show()
