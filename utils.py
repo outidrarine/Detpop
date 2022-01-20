@@ -15,11 +15,14 @@ def getSoundAtPosition(root, position, duration):
 
 
 # Function to get the filename with position
-def getFilenameAtPosition(root, position):
+def getFilenameAtPosition(root, position, with_root = True):
     for root, dirnames, filenames in os.walk(root):
         f = filenames[position]
-        filename = os.path.join(root, f)
-        return filename
+        if with_root:
+            filename = os.path.join(root, f)
+            return filename
+        else:
+            return f
 
 
 # Function to get the position with filename
