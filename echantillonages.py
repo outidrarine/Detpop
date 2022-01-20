@@ -5,14 +5,14 @@ from dppy.finite_dpps import FiniteDPP
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 
-from constructionPsi import compute_all_pertinence, getpsi
+from constructionPsi import get_all_pertinence, getpsi
 from utils import getFilenamesAtPositions
 
 # Echantillonage par pertinence
 
-def sampling_pertinence(nbSamples, duration = 5, root = './SoundDatabase', shuffling = True):
+def sampling_pertinence(nbSamples, shuffling = True):
 
-    q = compute_all_pertinence(root, duration)
+    q = get_all_pertinence(verbose = False)
 
     samples = q['file'][-nbSamples:]
 
