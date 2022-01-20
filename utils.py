@@ -64,10 +64,10 @@ def getPositionsOfFilenames(root, filenames, with_root = False):
             if f in filenames:
                 nbFound += 1
                 if with_root:
-                    positions[filenames.index(os.path.join(root, f))] = p
+                    positions[list(filenames).index(os.path.join(root, f))] = p
                 else:
 
-                    positions[filenames.index(f)] = p
+                    positions[list(filenames).index(f)] = p
                 
             if nbFound >= nbFilenames:
                 return positions
