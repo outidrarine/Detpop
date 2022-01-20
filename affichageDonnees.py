@@ -56,8 +56,13 @@ def displayPolarSamples(samples):
     colors = ['r', 'g', 'b']
     ax = plt.subplot(111, projection='polar')
     ax.set_theta_zero_location("N")
+    ax.set_theta_direction(-1)
+    ax.set_thetagrids((0, 90, 180, 270), labels = ('0', '6', '12', '18'))
     ax.grid(False)
-    ax.set_rmax(1)
+    ax.set_rgrids([])
+    ax.set_rlim(0.9)
+    ax.set_rmax(1.005)
+   
 
     for k, day in enumerate(samplesPerDay):
         theta = np.array(samplesPerDay[day]) * 360 / 1440
