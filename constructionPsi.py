@@ -10,12 +10,14 @@ import h5py
 
 from utils import getSound
 
+
 # Pertinence
 
 def compute_pertinence(sound, fe):
     Spec, tn, fn, _ = spectrogram(sound, fe)
     q = tfsd(Spec, fn, tn)
     return np.sqrt(q)
+
 
 def compute_all_pertinence(root, duration = 5, nbSounds = 432):
     
@@ -88,7 +90,6 @@ def compute_PSI(root, J, Q, duration, nbSounds, verbose = True):
     return np.array(psi)
 
 
-
 def getpsi(verbose = True):
 
     persisted_psi = h5py.File("./persisted_data/psi.hdf5", "a")
@@ -116,6 +117,7 @@ def similarity(position1, position2, psi):
     sound2 = psi[position2]
     cos = np.dot(sound1, sound2) / (np.linalg.norm(sound1) * np.linalg.norm(sound2))
     return cos
+
 
 def similarity_all(psi):
     nbSounds = psi.shape[0]
