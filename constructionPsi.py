@@ -19,11 +19,12 @@ def compute_pertinence(sound, fe):
     return np.sqrt(q)
 
 
-def compute_all_pertinence(root, duration = 5, nbSounds = 432):
+def compute_all_pertinence(root, duration = 5, nbSounds = 432, dtype = None):
     
-    dt = np.dtype([('file', np.unicode_, 64), ('pertinence', np.float64)])
+    if dtype is None:
+        dtype = np.dtype([('file', str, 29), ('pertinence', np.float64)])
 
-    q = np.zeros((nbSounds), dtype = dt)
+    q = np.zeros((nbSounds), dtype = dtype)
 
     k = 0
     for root, dirnames, filenames in os.walk(root):

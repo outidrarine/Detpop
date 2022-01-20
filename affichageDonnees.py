@@ -8,7 +8,6 @@ from maad.util import plot2d, power2dB
 from utils import getDateFromFilename
 from constructionPsi import compute_sample_pertinence, compute_average_similaritiy
 
-
 # Spectrogramme
 
 def displaySpectrogram(sound, fs, title, ax):
@@ -124,4 +123,53 @@ def scatter_over_similarity(similarities, dates, indexes=[], nbSounds = 432, ):
 
     cax = plt.axes([0.95, 0.05, 0.05,0.9 ])
     plt.colorbar(mappable=im, cax=cax)
+
+# Comparaison d'échantillonages
+
+def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase'):
+
+    # Initialisation
+    average_pertinences = {}
+    average_similarities = {}
+
+    for sampling_name in sampling_names:
+        average_pertinences[sampling_name] = np.zeros(nbSamplings)
+        average_similarities[sampling_name] = np.zeros(nbSamplings)
+
+    # Calculs
+    for s in range(nbSamplings):
+        for k, sampling in enumerate(sampling_list):
+            
+            samples = sampling(nbSamples)
+            sampling_name = sampling_names[k]
+            average_pertinences[sampling_name][s] = np.mean(compute_sample_pertinence(samples, root)['pertinence'])
+            average_similarities[sampling_name][s] = compute_average_similaritiy(samples, root)
+
+    # Affichage des résultats
+    cols_names = ['Pertinences', 'Similarities']
+    rows_names = sampling_names
+
+    fig, axes = plt.subplots(len(sampling_names), 2, figsize=(12, 8))
+
+    for ax, col in zip(axes[0], cols_names):
+        ax.set_title(col)
+
+    for ax, row in zip(axes[:,0], rows_names):
+        ax.set_ylabel(row, rotation = 90, size='large')
+
+    for k, sampling_name in enumerate(sampling_names):
+
+        print(sampling_name, ":")
+
+        print("Average pertinence : ", np.mean(average_pertinences[sampling_name]))
+        print("Average similarity : ", np.mean(average_similarities[sampling_name]))
+
+        print()
+
+        axes[k, 0].hist(average_pertinences[sampling_name])
+        axes[k, 0].set_xlim(0, 1)
+
+        axes[k, 1].hist(average_similarities[sampling_name])
+        axes[k, 1].set_xlim(0, 1)
+
     plt.show()
