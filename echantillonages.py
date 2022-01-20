@@ -2,6 +2,8 @@
 
 import numpy as np
 from dppy.finite_dpps import FiniteDPP
+from sklearn.cluster import KMeans
+from sklearn.metrics import pairwise_distances_argmin_min
 
 from constructionPsi import compute_all_pertinence, getpsi
 from utils import getFilenamesAtPositions
@@ -25,6 +27,21 @@ def sampling_pertinence(nbSamples, duration = 5, root = './SoundDatabase', shuff
 def sampling_random(nbSamples, nbSounds = 432, root = './SoundDatabase'):
 
     samples_positions = np.random.randint(0, high = nbSounds, size = nbSamples)
+
+    samples = getFilenamesAtPositions(root, samples_positions)
+
+    return samples
+
+
+# Echantillonage par K-Means
+
+def sampling_kmeans(nbSamples, root = './SoundDatabase'):
+
+    psi = getpsi(verbose = False)
+
+    kmeans = KMeans(n_clusters = nbSamples).fit(psi)
+
+    samples_positions, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, psi)
 
     samples = getFilenamesAtPositions(root, samples_positions)
 
