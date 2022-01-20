@@ -8,7 +8,7 @@ from maad.sound import spectrogram
 import os
 import h5py
 
-from utils import getSound
+from utils import getPositionsOfFilenames, getSound
 
 
 # Pertinence
@@ -24,17 +24,34 @@ def compute_all_pertinence(root, duration = 5, nbSounds = 432):
     dt = np.dtype([('file', np.unicode_, 64), ('pertinence', np.float64)])
 
     q = np.zeros((nbSounds), dtype = dt)
-    #q = [['', 0] for k in range(nbSounds)]
 
     k = 0
     for root, dirnames, filenames in os.walk(root):
-            for f in filenames:
-                filename = os.path.join(root, f)
-                sound, fe = getSound(filename, duration)
-                q[k] = f, compute_pertinence(sound, fe)
-                k += 1
+        for f in filenames:
+            filename = os.path.join(root, f)
+            sound, fe = getSound(filename, duration)
+            q[k] = f, compute_pertinence(sound, fe)
+            k += 1
    
     q.sort(order = 'pertinence')
+
+    return q
+
+
+def compute_sample_pertinence(samples, root, duration = 5):
+
+    nbSamples = len(samples)
+
+    dt = np.dtype([('file', np.unicode_, 64), ('pertinence', np.float64)])
+
+    q = np.zeros((nbSamples), dtype = dt)
+
+    k = 0
+    for f in samples:
+        filename = os.path.join(root, f)
+        sound, fe = getSound(filename, duration)
+        q[k] = f, compute_pertinence(sound, fe)
+        k += 1
 
     return q
 
@@ -122,7 +139,28 @@ def similarity(position1, position2, psi):
 def similarity_all(psi):
     nbSounds = psi.shape[0]
     similarities = np.zeros((nbSounds, nbSounds))
+
     for j in range(nbSounds):
         for i in range(nbSounds):
             similarities[i, j] = similarity(i, j, psi)
+
     return similarities
+
+def compute_average_similaritiy(samples, root, psi = getpsi(verbose = False)):
+
+    nbSamples = len(samples)
+
+    positions = getPositionsOfFilenames(root, samples)
+
+    avg_similarity = 0
+    k = 0
+    for j in range(0, nbSamples):
+        for i in range(0, j):
+            avg_similarity += similarity(positions[i], positions[j], psi)
+            k += 1
+    
+    avg_similarity /= nbSamples * (nbSamples - 1) / 2
+
+    return avg_similarity
+
+

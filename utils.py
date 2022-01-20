@@ -1,5 +1,6 @@
-from scipy.io import wavfile
 import os
+import numpy as np
+from scipy.io import wavfile
 
 # Function to get the sound with filename
 def getSound(filename, duration):
@@ -25,15 +26,53 @@ def getFilenameAtPosition(root, position, with_root = True):
             return f
 
 
+# Function to get the filename with position
+def getFilenamesAtPositions(root, positions, with_root = False):
+    for root, dirnames, filenames in os.walk(root):
+        if with_root:
+            return [os.path.join(root, f) for f in np.array(filenames)[positions]]
+        else:
+            return np.array(filenames)[positions]
+
+
+# Function to obtain all the filenames
+def getAllFilenames(root, with_root = False):
+    for root, dirnames, filenames in os.walk(root):
+        if with_root:
+            return [os.path.join(root, f) for f in filenames]
+        else:
+            return filenames
+
+
 # Function to get the position with filename
 def getPositionOfFilename(root, filename):
     for root, dirnames, filenames in os.walk(root):
-        k = 0
-        for f in filenames:
+        for p, f in enumerate(filenames):
             if f == filename:
-                return k
-            else:
-                k += 1
+                return p
+
+# Function to get the position of a list of filename
+def getPositionsOfFilenames(root, filenames, with_root = False):
+
+    nbFilenames = len(filenames)
+    positions = [0] * nbFilenames
+
+    for root, dirnames, files in os.walk(root):
+        nbFound = 0
+        for p, f in enumerate(files):
+
+            if f in filenames:
+                nbFound += 1
+
+                if with_root:
+                    positions[np.where(filenames == os.path.join(root, f))[0][0]] = p
+                else:
+                    positions[np.where(filenames == f)[0][0]] = p
+                
+            if nbFound >= nbFilenames:
+                return positions
+
+    return positions
 
 
 # Get the date associated to a filename

@@ -68,5 +68,6 @@ def displayPolarSamples(samples):
         theta = np.array(samplesPerDay[day]) * 360 / 1440
         ax.plot(theta, np.ones(theta.shape), colors[k] + 'o', label = day)
     
+    plt.title("Répartition temporelle des échantillons")
     plt.legend()
     plt.show()
