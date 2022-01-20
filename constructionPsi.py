@@ -56,6 +56,40 @@ def compute_sample_pertinence(samples, root, duration = 5):
     return q
 
 
+def get_all_pertinence(verbose = True):
+
+    persisted_all_pertinence = h5py.File("./persisted_data/pertinence.hdf5", "a")
+
+    if 'all_pertinence' in persisted_all_pertinence:
+        if verbose:
+            print("loading pertinences from persisted file")
+        q = persisted_all_pertinence['all_pertinence'][:]
+
+        dtype = np.dtype([('file', str, 29), ('pertinence', np.float64)])
+        q_bis = np.zeros(q.size, dtype = dtype)
+
+        q_bis['file'] = np.array([filename.decode("utf-8") for filename in q['file']])
+        q_bis['pertinence'] = q['pertinence']
+
+    else:
+        if verbose:
+            print("creating pertinences and persisting it to a file")
+
+        dt = ([('file', h5py.string_dtype('utf-8', 29)), ('pertinence', float)])
+        q = compute_all_pertinence('./SoundDatabase', dtype = dt)
+        persisted_all_pertinence.create_dataset('all_pertinence', data = q, dtype = dt)
+
+        dtype = np.dtype([('file', str, 29), ('pertinence', np.float64)])
+        q_bis = np.zeros(q.size, dtype = dtype)
+
+        q_bis['file'] = np.array([filename.decode("utf-8") for filename in q['file']])
+        q_bis['pertinence'] = q['pertinence']
+
+    persisted_all_pertinence.close()
+
+    return q_bis
+
+
 # Descripteur
 
 def compute_descriptor(sound, J, Q):
