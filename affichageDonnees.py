@@ -1,12 +1,13 @@
 # Librairies
 
+import sys
 import numpy as np
 from matplotlib import pyplot as plt
 from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
 
-from utils import getDateFromFilename, getPositionOfFilename
-from constructionPsi import compute_sample_pertinence, compute_average_similaritiy
+from utils import getDateFromFilename, getPositionOfFilename, getAllDates
+from constructionPsi import compute_sample_pertinence, compute_average_similaritiy, get_all_pertinence, similarity_all, getpsi
 
 # Spectrogramme
 
@@ -77,12 +78,13 @@ def displayPolarSamples(samples):
 
 def present_sampling(sampling_function, nbSamples):
 
+    # Initilaisation et calculs
     root = './SoundDatabase'
     samples = sampling_function(nbSamples)
 
     pertinences = compute_sample_pertinence(samples, root)
 
-
+    # Affichage des textes
     print()
     print("Samples:", samples)
     print()
@@ -94,41 +96,81 @@ def present_sampling(sampling_function, nbSamples):
     print("Average similarity:", compute_average_similaritiy(samples, root))
     print()
 
+    # Affichages sur figure polaire
     displayPolarSamples(samples)
 
-# Indiquer les échantillons sellectionées par dpp dans la courbe des pertinences
+    # Affichage sur figure pertinences
+    q = get_all_pertinence(verbose = False)
+    q.sort(order = 'file')
+
+    dates = getAllDates(root, with_year = False)
+
+    scatter_over_pertinence(q, dates, samples)
+
+    # Affichage sur figure similarités
+    psi = getpsi(verbose = False)
+
+    similarities = similarity_all(psi)
+
+    scatter_over_similarity(similarities, dates, indexes = samples)
+
+    
+
+
+# Indiquer les échantillons selectionnés par un échantillonage dans la courbe des pertinences
+
 def scatter_over_pertinence(q, dates, indexes=[], nbSounds = 432):
     
+    step = 20
+    dates = dates[::step]
+
     fig = plt.figure(figsize = (15, 7))
     plt.plot(q['pertinence'])
-    mean_pertinence = np.mean([p[1] for p in q])
+    
+    mean_pertinence = np.mean(q['pertinence'])
+    
     plt.pause
     plt.plot([0, len(q)],[mean_pertinence, mean_pertinence])
+    
     for index in indexes:
         place = getPositionOfFilename('./SoundDatabase', index)
         plt.pause
-        plt.scatter(place, q[place][1], 50, marker='x', color = 'r')
-    plt.xticks(np.arange(0, nbSounds, step = 20), dates, rotation = 90)
+        plt.scatter(place, q['pertinence'][place], 50, marker='x', color = 'r')
+    
+    plt.xticks(np.arange(0, nbSounds, step = step), dates, rotation = 90)
     plt.ylabel("Pertinence")
+    
     plt.show()
 
-# Indiquer les échantillongs sellectionées par dpp dans la courbe des similarités
+
+# Indiquer les échantillons selectionnés par un échantillonage dans la courbe des similarités
+
 def scatter_over_similarity(similarities, dates, indexes=[], nbSounds = 432 ):
+    
     step = 20
+
+    dates = dates[::step]
+
     plt.figure(figsize=(8, 8))
+
     ax = plt.axes([0, 0.05, 0.9, 0.9 ])
     ax.grid(False)
     ax.set_title("Similarités")
+
     im = ax.imshow((similarities - np.min(similarities))/(np.max(similarities) - np.min(similarities)), cmap = 'viridis')
+
     plt.xticks(np.arange(0, nbSounds, step = step), dates, rotation = 90)
     plt.yticks(np.arange(0, nbSounds, step = step), dates, rotation = 0)
+
     for index in indexes:
         place = getPositionOfFilename('./SoundDatabase', index)
         plt.pause
         plt.scatter(place, place, 200, marker='x', color = 'r')
 
     cax = plt.axes([0.95, 0.05, 0.05,0.9 ])
+    
     plt.colorbar(mappable=im, cax=cax)
+
 
 # Comparaison d'échantillonages
 
@@ -144,6 +186,12 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
 
     # Calculs
     for s in range(nbSamplings):
+
+        # Afficahge de la progression
+        sys.stdout.write('\r')
+        sys.stdout.write("[%-100s] %d%%" % ('='*round(s / (nbSamplings - 1) * 100), 100*s/(nbSamplings - 1)))
+        sys.stdout.flush()
+
         for k, sampling in enumerate(sampling_list):
             
             samples = sampling(nbSamples)
@@ -163,6 +211,8 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
     for ax, row in zip(axes[:,0], rows_names):
         ax.set_ylabel(row, rotation = 90, size='large')
 
+    print()
+
     for k, sampling_name in enumerate(sampling_names):
 
         print(sampling_name, ":")
@@ -172,10 +222,8 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
 
         print()
 
-        axes[k, 0].hist(average_pertinences[sampling_name])
-        axes[k, 0].set_xlim(0, 1)
+        axes[k, 0].hist(average_pertinences[sampling_name], bins = 40, range = (0, 1))
 
-        axes[k, 1].hist(average_similarities[sampling_name])
-        axes[k, 1].set_xlim(0, 1)
+        axes[k, 1].hist(average_similarities[sampling_name], bins = 40, range = (0, 1))
 
     plt.show()
