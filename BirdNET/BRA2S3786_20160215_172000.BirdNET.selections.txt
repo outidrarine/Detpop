@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_172000.wav	3.0	6.0	150	15000	prowar	Prothonotary Warbler	0.17508268095770074	1
+2	Spectrogram 1	1	BRA2S3786_20160215_172000.wav	3.0	6.0	150	15000	bawwar	Black-and-white Warbler	0.11065253972253561	2
+3	Spectrogram 1	1	BRA2S3786_20160215_172000.wav	0.0	3.0	150	15000	whtdov	White-tipped Dove	0.14278444624054684	1

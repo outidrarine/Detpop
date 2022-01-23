@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_140000.wav	3.0	6.0	150	15000	wesmea	Western Meadowlark	0.22796289229920857	1
+2	Spectrogram 1	1	BRA2S3786_20160215_140000.wav	3.0	6.0	150	15000	altori	Altamira Oriole	0.17632395492284297	2
+3	Spectrogram 1	1	BRA2S3786_20160215_140000.wav	3.0	6.0	150	15000	eurbul	Eurasian Bullfinch	0.12748166055932802	3
+4	Spectrogram 1	1	BRA2S3786_20160215_140000.wav	0.0	3.0	150	15000	wesmea	Western Meadowlark	0.2575200244581335	1
+5	Spectrogram 1	1	BRA2S3786_20160215_140000.wav	0.0	3.0	150	15000	moublu	Mountain Bluebird	0.15436869466938452	2

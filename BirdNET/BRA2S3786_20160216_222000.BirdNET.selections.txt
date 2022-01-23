@@ -1,0 +1,7 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_222000.wav	3.0	6.0	150	15000	brwhaw	Broad-winged Hawk	0.4066762151161435	1
+2	Spectrogram 1	1	BRA2S3786_20160216_222000.wav	3.0	6.0	150	15000	blkgui	Black Guillemot	0.19254833126840035	2
+3	Spectrogram 1	1	BRA2S3786_20160216_222000.wav	3.0	6.0	150	15000	compau	Common Pauraque	0.1397959301337151	3
+4	Spectrogram 1	1	BRA2S3786_20160216_222000.wav	0.0	3.0	150	15000	brwhaw	Broad-winged Hawk	0.8961492284313233	1
+5	Spectrogram 1	1	BRA2S3786_20160216_222000.wav	0.0	3.0	150	15000	whtspa	White-throated Sparrow	0.36871842070806127	2
+6	Spectrogram 1	1	BRA2S3786_20160216_222000.wav	0.0	3.0	150	15000	varthr	Varied Thrush	0.1260937995821052	3

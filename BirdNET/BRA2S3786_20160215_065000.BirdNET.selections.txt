@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_065000.wav	3.0	6.0	150	15000	norcar	Northern Cardinal	0.3385333081902689	1
+2	Spectrogram 1	1	BRA2S3786_20160215_065000.wav	3.0	6.0	150	15000	clcrob	Clay-colored Thrush	0.1485430091022157	2
+3	Spectrogram 1	1	BRA2S3786_20160215_065000.wav	0.0	3.0	150	15000	norcar	Northern Cardinal	0.2985004483801262	1
+4	Spectrogram 1	1	BRA2S3786_20160215_065000.wav	0.0	3.0	150	15000	yebcha	Yellow-breasted Chat	0.10304176900301074	2
+5	Spectrogram 1	1	BRA2S3786_20160215_065000.wav	0.0	3.0	150	15000	grnher	Green Heron	0.10295960710338725	3

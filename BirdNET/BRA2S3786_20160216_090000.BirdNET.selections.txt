@@ -1,0 +1,3 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_090000.wav	3.0	6.0	150	15000	grnher	Green Heron	0.7643970942905939	1
+2	Spectrogram 1	1	BRA2S3786_20160216_090000.wav	0.0	3.0	150	15000	osprey	Osprey	0.33946666274758164	1

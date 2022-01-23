@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_004000.wav	3.0	6.0	150	15000	whtspa	White-throated Sparrow	0.8971114694814183	1
+2	Spectrogram 1	1	BRA2S3786_20160215_004000.wav	3.0	6.0	150	15000	harspa	Harris's Sparrow	0.20973105765232192	2
+3	Spectrogram 1	1	BRA2S3786_20160215_004000.wav	3.0	6.0	150	15000	gocspa	Golden-crowned Sparrow	0.12000593299943974	3
+4	Spectrogram 1	1	BRA2S3786_20160215_004000.wav	0.0	3.0	150	15000	comsan	Common Sandpiper	0.6602456869060516	1
+5	Spectrogram 1	1	BRA2S3786_20160215_004000.wav	0.0	3.0	150	15000	wewpew	Western Wood-Pewee	0.2927781064003668	2

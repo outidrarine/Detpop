@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_104000.wav	3.0	6.0	150	15000	tuftit	Tufted Titmouse	0.17659191901210683	1
+2	Spectrogram 1	1	BRA2S3786_20160214_104000.wav	3.0	6.0	150	15000	gockin	Golden-crowned Kinglet	0.10979454397105472	2
+3	Spectrogram 1	1	BRA2S3786_20160214_104000.wav	3.0	6.0	150	15000	whtspa	White-throated Sparrow	0.1000402697890311	3
+4	Spectrogram 1	1	BRA2S3786_20160214_104000.wav	0.0	3.0	150	15000	bacspa	Bachman's Sparrow	0.3366476345429991	1
+5	Spectrogram 1	1	BRA2S3786_20160214_104000.wav	0.0	3.0	150	15000	tuftit	Tufted Titmouse	0.10424026440613766	2

@@ -1,0 +1,3 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_181000.wav	3.0	6.0	150	15000	winwre3	Winter Wren	0.11647828131869731	1
+2	Spectrogram 1	1	BRA2S3786_20160214_181000.wav	0.0	3.0	150	15000	winwre4	Eurasian Wren	0.4809752032738359	1

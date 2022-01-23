@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_163000.wav	0.0	3.0	150	15000	blagro1	Black Grouse	0.4374833509994632	1
+2	Spectrogram 1	1	BRA2S3786_20160214_163000.wav	0.0	3.0	150	15000	cowpig1	Common Wood-Pigeon	0.14194296085565514	2
+3	Spectrogram 1	1	BRA2S3786_20160214_163000.wav	0.0	3.0	150	15000	????	Human	0.13169922131334144	3

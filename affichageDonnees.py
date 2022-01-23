@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
 
-from utils import getDateFromFilename, getPositionOfFilename, getAllDates
+from utils import getDateFromFilename, getPositionOfFilename, getAllDates, extract_birds
 from constructionPsi import compute_sample_pertinence, compute_average_similaritiy, get_all_pertinence, similarity_all, getpsi
 
 # Spectrogramme
@@ -114,6 +114,11 @@ def present_sampling(sampling_function, nbSamples):
 
     scatter_over_similarity(similarities, dates, indexes = samples)
 
+    # Extraction des oiseaux 
+    birds_set = extract_birds(samples,'./BirdNET')
+    print('Extraction of birds from those samples :',len(birds_set))
+    print(birds_set)
+
     
 
 
@@ -170,6 +175,7 @@ def scatter_over_similarity(similarities, dates, indexes=[], nbSounds = 432 ):
     cax = plt.axes([0.95, 0.05, 0.05,0.9 ])
     
     plt.colorbar(mappable=im, cax=cax)
+    plt.show()
 
 
 # Comparaison d'échantillonages

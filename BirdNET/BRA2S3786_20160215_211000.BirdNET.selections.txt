@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_211000.wav	3.0	6.0	150	15000	yellow2	Yellowhammer	0.6018217605247251	1
+2	Spectrogram 1	1	BRA2S3786_20160215_211000.wav	3.0	6.0	150	15000	whtspa	White-throated Sparrow	0.4707650561399353	2
+3	Spectrogram 1	1	BRA2S3786_20160215_211000.wav	0.0	3.0	150	15000	whtspa	White-throated Sparrow	0.7213739843597619	1
+4	Spectrogram 1	1	BRA2S3786_20160215_211000.wav	0.0	3.0	150	15000	yellow2	Yellowhammer	0.27874741812188364	2
+5	Spectrogram 1	1	BRA2S3786_20160215_211000.wav	0.0	3.0	150	15000	harspa	Harris's Sparrow	0.17053293635520794	3

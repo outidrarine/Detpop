@@ -1,0 +1,7 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_151000.wav	3.0	6.0	150	15000	whtspa	White-throated Sparrow	0.2655944641213962	1
+2	Spectrogram 1	1	BRA2S3786_20160214_151000.wav	3.0	6.0	150	15000	daejun	Dark-eyed Junco	0.15423862338412003	2
+3	Spectrogram 1	1	BRA2S3786_20160214_151000.wav	3.0	6.0	150	15000	tuftit	Tufted Titmouse	0.12513224033236667	3
+4	Spectrogram 1	1	BRA2S3786_20160214_151000.wav	0.0	3.0	150	15000	cirbun1	Cirl Bunting	0.4206623133387789	1
+5	Spectrogram 1	1	BRA2S3786_20160214_151000.wav	0.0	3.0	150	15000	spofly1	Spotted Flycatcher	0.29634297173929036	2
+6	Spectrogram 1	1	BRA2S3786_20160214_151000.wav	0.0	3.0	150	15000	bacspa	Bachman's Sparrow	0.105785963564611	3

@@ -1,0 +1,5 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_082000.wav	3.0	6.0	150	15000	litswi1	Little Swift	0.1068413559226022	1
+2	Spectrogram 1	1	BRA2S3786_20160215_082000.wav	3.0	6.0	150	15000	buthum	Blue-throated Hummingbird	0.10479526072574787	2
+3	Spectrogram 1	1	BRA2S3786_20160215_082000.wav	3.0	6.0	150	15000	trokin	Tropical Kingbird	0.1028999361540596	3
+4	Spectrogram 1	1	BRA2S3786_20160215_082000.wav	0.0	3.0	150	15000	grcfly	Great Crested Flycatcher	0.9996509602160989	1

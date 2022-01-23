@@ -1,0 +1,7 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_152000.wav	3.0	6.0	150	15000	amecro	American Crow	0.268423451499449	1
+2	Spectrogram 1	1	BRA2S3786_20160214_152000.wav	3.0	6.0	150	15000	norcro	Northwestern Crow	0.13936729882236898	2
+3	Spectrogram 1	1	BRA2S3786_20160214_152000.wav	3.0	6.0	150	15000	redjun	Red Junglefowl	0.113732936215059	3
+4	Spectrogram 1	1	BRA2S3786_20160214_152000.wav	0.0	3.0	150	15000	norcro	Northwestern Crow	0.7130510416854796	1
+5	Spectrogram 1	1	BRA2S3786_20160214_152000.wav	0.0	3.0	150	15000	amecro	American Crow	0.15300851146620195	2
+6	Spectrogram 1	1	BRA2S3786_20160214_152000.wav	0.0	3.0	150	15000	whtspa	White-throated Sparrow	0.10949271501955964	3

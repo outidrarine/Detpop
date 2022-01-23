@@ -1,0 +1,5 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_213000.wav	3.0	6.0	150	15000	blkrai	Black Rail	0.17453172030651345	1
+2	Spectrogram 1	1	BRA2S3786_20160214_213000.wav	3.0	6.0	150	15000	arcter	Arctic Tern	0.1110828262282992	2
+3	Spectrogram 1	1	BRA2S3786_20160214_213000.wav	0.0	3.0	150	15000	aldfly	Alder Flycatcher	0.4130143260939026	1
+4	Spectrogram 1	1	BRA2S3786_20160214_213000.wav	0.0	3.0	150	15000	blkrai	Black Rail	0.2767379315187833	2

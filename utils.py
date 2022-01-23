@@ -1,6 +1,8 @@
 import os
 import numpy as np
 from scipy.io import wavfile
+import pandas as pd
+
 
 # Function to get the sound with filename
 def getSound(filename, duration):
@@ -101,3 +103,15 @@ def getAllDates(root, with_year = True):
         for f in filenames:
             dates.append(getDateFromFilename(f, with_year = with_year))
     return dates
+# Extract set of birds from samples
+def extract_birds(samples, root):
+    for root, dirnames, filenames in os.walk(root):
+        birds_file_name = np.array(filenames)
+        clip_name = [filename.split('.')[0]+'.wav' for filename in np.array(filenames)]
+        indexes_of_birds_files = [list(clip_name).index(clip) for clip in clip_name if clip in samples]
+        col_list = ['Selection', 'View', 'Channel', 'Begin File', 'Begin Time (s)', 'End Time (s)', 'Low Freq (Hz)', 'High Freq (Hz)',	'Species Code',	'Common Name', 'Confidence', 'Rank']
+        set_of_birds = set()
+        for index_of_bird_file in indexes_of_birds_files:
+            data = pd.read_csv('./BirdNET/'+birds_file_name[index_of_bird_file], sep="\t",usecols = col_list)
+            set_of_birds = set_of_birds.union(set(data['Species Code']))
+        return set_of_birds

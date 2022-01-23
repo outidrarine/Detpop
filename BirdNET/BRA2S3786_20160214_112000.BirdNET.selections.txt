@@ -1,0 +1,7 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_112000.wav	3.0	6.0	150	15000	caltow	California Towhee	0.3515985641590065	1
+2	Spectrogram 1	1	BRA2S3786_20160214_112000.wav	3.0	6.0	150	15000	whtspa	White-throated Sparrow	0.2899525253858836	2
+3	Spectrogram 1	1	BRA2S3786_20160214_112000.wav	3.0	6.0	150	15000	gocspa	Golden-crowned Sparrow	0.10407858827485417	3
+4	Spectrogram 1	1	BRA2S3786_20160214_112000.wav	0.0	3.0	150	15000	carchi	Carolina Chickadee	0.21659274989305025	1
+5	Spectrogram 1	1	BRA2S3786_20160214_112000.wav	0.0	3.0	150	15000	tuftit	Tufted Titmouse	0.18683710505575574	2
+6	Spectrogram 1	1	BRA2S3786_20160214_112000.wav	0.0	3.0	150	15000	gockin	Golden-crowned Kinglet	0.11142879729368908	3

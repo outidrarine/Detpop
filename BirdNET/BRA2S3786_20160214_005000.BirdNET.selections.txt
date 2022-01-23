@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_005000.wav	3.0	6.0	150	15000	booeag1	Booted Eagle	0.21474797013789432	1
+2	Spectrogram 1	1	BRA2S3786_20160214_005000.wav	3.0	6.0	150	15000	astfly	Ash-throated Flycatcher	0.15068000170145754	2
+3	Spectrogram 1	1	BRA2S3786_20160214_005000.wav	3.0	6.0	150	15000	wantat1	Wandering Tattler	0.1100142607623698	3

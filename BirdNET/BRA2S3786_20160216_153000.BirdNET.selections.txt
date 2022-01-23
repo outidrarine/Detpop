@@ -1,0 +1,7 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_153000.wav	3.0	6.0	150	15000	eurcur	Eurasian Curlew	0.7974651695169827	1
+2	Spectrogram 1	1	BRA2S3786_20160216_153000.wav	3.0	6.0	150	15000	pacloo	Pacific Loon	0.13670342639173402	2
+3	Spectrogram 1	1	BRA2S3786_20160216_153000.wav	3.0	6.0	150	15000	comloo	Common Loon	0.1330348213763941	3
+4	Spectrogram 1	1	BRA2S3786_20160216_153000.wav	0.0	3.0	150	15000	comloo	Common Loon	0.5409611419410914	1
+5	Spectrogram 1	1	BRA2S3786_20160216_153000.wav	0.0	3.0	150	15000	eurcur	Eurasian Curlew	0.3634350996493913	2
+6	Spectrogram 1	1	BRA2S3786_20160216_153000.wav	0.0	3.0	150	15000	????	Human	0.2873290231544093	3

@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_083000.wav	3.0	6.0	150	15000	gockin	Golden-crowned Kinglet	0.3076213425379413	1
+2	Spectrogram 1	1	BRA2S3786_20160214_083000.wav	3.0	6.0	150	15000	bkpwar	Blackpoll Warbler	0.12180176554906236	2
+3	Spectrogram 1	1	BRA2S3786_20160214_083000.wav	0.0	3.0	150	15000	tuftit	Tufted Titmouse	0.20533615073263733	1
+4	Spectrogram 1	1	BRA2S3786_20160214_083000.wav	0.0	3.0	150	15000	carchi	Carolina Chickadee	0.13297522172557727	2
+5	Spectrogram 1	1	BRA2S3786_20160214_083000.wav	0.0	3.0	150	15000	bacspa	Bachman's Sparrow	0.10275127884800535	3

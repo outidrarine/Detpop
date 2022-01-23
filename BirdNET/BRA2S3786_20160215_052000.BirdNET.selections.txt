@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_052000.wav	3.0	6.0	150	15000	logshr	Loggerhead Shrike	0.5395450101250536	1
+2	Spectrogram 1	1	BRA2S3786_20160215_052000.wav	3.0	6.0	150	15000	royter1	Royal Tern	0.3087642344013647	2
+3	Spectrogram 1	1	BRA2S3786_20160215_052000.wav	3.0	6.0	150	15000	norshr1	Great Gray Shrike	0.14272179552038242	3

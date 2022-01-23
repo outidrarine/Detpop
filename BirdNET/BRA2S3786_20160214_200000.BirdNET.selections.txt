@@ -1,0 +1,5 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_200000.wav	3.0	6.0	150	15000	whtspa	White-throated Sparrow	0.7607193447625609	1
+2	Spectrogram 1	1	BRA2S3786_20160214_200000.wav	3.0	6.0	150	15000	casspa	Cassin's Sparrow	0.13212107030355566	2
+3	Spectrogram 1	1	BRA2S3786_20160214_200000.wav	3.0	6.0	150	15000	varthr	Varied Thrush	0.1055902801148804	3
+4	Spectrogram 1	1	BRA2S3786_20160214_200000.wav	0.0	3.0	150	15000	whtspa	White-throated Sparrow	0.9519066681316051	1

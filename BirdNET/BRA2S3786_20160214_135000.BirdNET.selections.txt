@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_135000.wav	3.0	6.0	150	15000	bacspa	Bachman's Sparrow	0.42304179891062127	1
+2	Spectrogram 1	1	BRA2S3786_20160214_135000.wav	3.0	6.0	150	15000	tuftit	Tufted Titmouse	0.1034875686699803	2
+3	Spectrogram 1	1	BRA2S3786_20160214_135000.wav	0.0	3.0	150	15000	bacspa	Bachman's Sparrow	0.6516393636595318	1
+4	Spectrogram 1	1	BRA2S3786_20160214_135000.wav	0.0	3.0	150	15000	tuftit	Tufted Titmouse	0.20824363626993897	2
+5	Spectrogram 1	1	BRA2S3786_20160214_135000.wav	0.0	3.0	150	15000	carchi	Carolina Chickadee	0.16018678121461974	3

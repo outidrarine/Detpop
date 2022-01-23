@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_131000.wav	3.0	6.0	150	15000	norbob	Northern Bobwhite	0.96854452351292	1
+2	Spectrogram 1	1	BRA2S3786_20160214_131000.wav	3.0	6.0	150	15000	audori	Audubon's Oriole	0.19255812762913366	2
+3	Spectrogram 1	1	BRA2S3786_20160214_131000.wav	0.0	3.0	150	15000	bacspa	Bachman's Sparrow	0.2512717788292375	1
+4	Spectrogram 1	1	BRA2S3786_20160214_131000.wav	0.0	3.0	150	15000	tuftit	Tufted Titmouse	0.2188360259139677	2
+5	Spectrogram 1	1	BRA2S3786_20160214_131000.wav	0.0	3.0	150	15000	carchi	Carolina Chickadee	0.1706761606198684	3

@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_233000.wav	3.0	6.0	150	15000	fiespa	Field Sparrow	0.25009132723826305	1
+2	Spectrogram 1	1	BRA2S3786_20160214_233000.wav	3.0	6.0	150	15000	brespa	Brewer's Sparrow	0.13124218732059234	2
+3	Spectrogram 1	1	BRA2S3786_20160214_233000.wav	0.0	3.0	150	15000	chwwid	Chuck-will's-widow	0.5182059153797858	1
+4	Spectrogram 1	1	BRA2S3786_20160214_233000.wav	0.0	3.0	150	15000	compau	Common Pauraque	0.3938430286750229	2
+5	Spectrogram 1	1	BRA2S3786_20160214_233000.wav	0.0	3.0	150	15000	elfowl	Elf Owl	0.2644707016973311	3

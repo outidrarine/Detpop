@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_033000.wav	0.0	3.0	150	15000	pingro	Pine Grosbeak	0.6307282122298816	1
+2	Spectrogram 1	1	BRA2S3786_20160214_033000.wav	0.0	3.0	150	15000	booeag1	Booted Eagle	0.511179958895174	2
+3	Spectrogram 1	1	BRA2S3786_20160214_033000.wav	0.0	3.0	150	15000	greyel	Greater Yellowlegs	0.19477491923890028	3

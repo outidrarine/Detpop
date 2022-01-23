@@ -1,0 +1,5 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_042000.wav	3.0	6.0	150	15000	baleag	Bald Eagle	0.18547863212446147	1
+2	Spectrogram 1	1	BRA2S3786_20160215_042000.wav	3.0	6.0	150	15000	booeag1	Booted Eagle	0.1603245777842742	2
+3	Spectrogram 1	1	BRA2S3786_20160215_042000.wav	3.0	6.0	150	15000	litgre1	Little Grebe	0.10439035334635477	3
+4	Spectrogram 1	1	BRA2S3786_20160215_042000.wav	0.0	3.0	150	15000	blkoys	Black Oystercatcher	0.17962436363118603	1

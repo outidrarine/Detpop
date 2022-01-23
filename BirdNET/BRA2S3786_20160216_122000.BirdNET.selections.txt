@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_122000.wav	3.0	6.0	150	15000	graspa	Grasshopper Sparrow	0.7192221211923533	1
+2	Spectrogram 1	1	BRA2S3786_20160216_122000.wav	3.0	6.0	150	15000	rufhum	Rufous Hummingbird	0.13212105265627697	2
+3	Spectrogram 1	1	BRA2S3786_20160216_122000.wav	0.0	3.0	150	15000	graspa	Grasshopper Sparrow	0.32484749609759317	1
+4	Spectrogram 1	1	BRA2S3786_20160216_122000.wav	0.0	3.0	150	15000	buwwar	Blue-winged Warbler	0.188274358407941	2
+5	Spectrogram 1	1	BRA2S3786_20160216_122000.wav	0.0	3.0	150	15000	olispa	Olive Sparrow	0.11444229770027851	3

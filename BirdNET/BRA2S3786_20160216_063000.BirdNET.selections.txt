@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_063000.wav	3.0	6.0	150	15000	bkctch1	Black-crowned Tchagra	0.20524086818064702	1
+2	Spectrogram 1	1	BRA2S3786_20160216_063000.wav	3.0	6.0	150	15000	pyrrhu	Pyrrhuloxia	0.12318345546166082	2
+3	Spectrogram 1	1	BRA2S3786_20160216_063000.wav	0.0	3.0	150	15000	grcfly	Great Crested Flycatcher	0.9927518676254773	1

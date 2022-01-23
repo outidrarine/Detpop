@@ -1,0 +1,2 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_062000.wav	0.0	3.0	150	15000	subfly	Sulphur-bellied Flycatcher	0.9941194176756383	1

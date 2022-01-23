@@ -1,0 +1,7 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_081000.wav	3.0	6.0	150	15000	osprey	Osprey	0.4625854937725713	1
+2	Spectrogram 1	1	BRA2S3786_20160215_081000.wav	3.0	6.0	150	15000	whtkit	White-tailed Kite	0.3679260626397542	2
+3	Spectrogram 1	1	BRA2S3786_20160215_081000.wav	3.0	6.0	150	15000	whtkin2	White-throated Kingfisher	0.17182072945400648	3
+4	Spectrogram 1	1	BRA2S3786_20160215_081000.wav	0.0	3.0	150	15000	kinrai4	King Rail	0.149776679898577	1
+5	Spectrogram 1	1	BRA2S3786_20160215_081000.wav	0.0	3.0	150	15000	y00475	American Coot	0.13671673761061978	2
+6	Spectrogram 1	1	BRA2S3786_20160215_081000.wav	0.0	3.0	150	15000	wescap1	Western Capercaillie	0.13341746692815387	3

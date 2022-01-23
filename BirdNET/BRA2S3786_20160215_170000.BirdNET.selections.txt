@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_170000.wav	0.0	3.0	150	15000	grcfly	Great Crested Flycatcher	0.21770970118125219	1
+2	Spectrogram 1	1	BRA2S3786_20160215_170000.wav	0.0	3.0	150	15000	lecthr	LeConte's Thrasher	0.12267891797760402	2
+3	Spectrogram 1	1	BRA2S3786_20160215_170000.wav	0.0	3.0	150	15000	snoplo5	Snowy Plover	0.10394660096920214	3

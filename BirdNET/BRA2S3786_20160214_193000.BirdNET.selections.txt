@@ -1,0 +1,7 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_193000.wav	3.0	6.0	150	15000	incdov	Inca Dove	0.7731297877191536	1
+2	Spectrogram 1	1	BRA2S3786_20160214_193000.wav	3.0	6.0	150	15000	tawowl1	Tawny Owl	0.12069918979310759	2
+3	Spectrogram 1	1	BRA2S3786_20160214_193000.wav	3.0	6.0	150	15000	compau	Common Pauraque	0.10327773930583638	3
+4	Spectrogram 1	1	BRA2S3786_20160214_193000.wav	0.0	3.0	150	15000	easowl1	Eastern Screech-Owl	0.5284993081709027	1
+5	Spectrogram 1	1	BRA2S3786_20160214_193000.wav	0.0	3.0	150	15000	comloo	Common Loon	0.12780139799905743	2
+6	Spectrogram 1	1	BRA2S3786_20160214_193000.wav	0.0	3.0	150	15000	tawowl1	Tawny Owl	0.11795083164577638	3

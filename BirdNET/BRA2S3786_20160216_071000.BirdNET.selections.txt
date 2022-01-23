@@ -1,0 +1,5 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_071000.wav	3.0	6.0	150	15000	wooduc	Wood Duck	0.7334898146519414	1
+2	Spectrogram 1	1	BRA2S3786_20160216_071000.wav	3.0	6.0	150	15000	baleag	Bald Eagle	0.2454918602841456	2
+3	Spectrogram 1	1	BRA2S3786_20160216_071000.wav	0.0	3.0	150	15000	norcar	Northern Cardinal	0.3414775378345897	1
+4	Spectrogram 1	1	BRA2S3786_20160216_071000.wav	0.0	3.0	150	15000	moudov	Mourning Dove	0.151418286043161	2

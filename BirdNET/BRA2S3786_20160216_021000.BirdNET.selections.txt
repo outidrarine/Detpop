@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_021000.wav	0.0	3.0	150	15000	leagre	Least Grebe	0.18611571281932224	1
+2	Spectrogram 1	1	BRA2S3786_20160216_021000.wav	0.0	3.0	150	15000	solsan	Solitary Sandpiper	0.11496087942121229	2
+3	Spectrogram 1	1	BRA2S3786_20160216_021000.wav	0.0	3.0	150	15000	bbwduc	Black-bellied Whistling-Duck	0.11403438874190847	3

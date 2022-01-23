@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_100000.wav	3.0	6.0	150	15000	whtdov	White-tipped Dove	0.3485559503827911	1
+2	Spectrogram 1	1	BRA2S3786_20160216_100000.wav	3.0	6.0	150	15000	graspa	Grasshopper Sparrow	0.15426573974198762	2
+3	Spectrogram 1	1	BRA2S3786_20160216_100000.wav	3.0	6.0	150	15000	moudov	Mourning Dove	0.10079072446527952	3
+4	Spectrogram 1	1	BRA2S3786_20160216_100000.wav	0.0	3.0	150	15000	wescap1	Western Capercaillie	0.17914155358461245	1
+5	Spectrogram 1	1	BRA2S3786_20160216_100000.wav	0.0	3.0	150	15000	comrav	Common Raven	0.12633691557507906	2

@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_121000.wav	0.0	3.0	150	15000	rthhum	Ruby-throated Hummingbird	0.17146344832132446	1
+2	Spectrogram 1	1	BRA2S3786_20160216_121000.wav	0.0	3.0	150	15000	buwwar	Blue-winged Warbler	0.1393041855513023	2
+3	Spectrogram 1	1	BRA2S3786_20160216_121000.wav	0.0	3.0	150	15000	rufhum	Rufous Hummingbird	0.12557475946871985	3

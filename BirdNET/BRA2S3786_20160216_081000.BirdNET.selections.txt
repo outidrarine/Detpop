@@ -1,0 +1,5 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_081000.wav	3.0	6.0	150	15000	eugori2	Eurasian Golden Oriole	0.2562244314227677	1
+2	Spectrogram 1	1	BRA2S3786_20160216_081000.wav	3.0	6.0	150	15000	subfly	Sulphur-bellied Flycatcher	0.14344109218681034	2
+3	Spectrogram 1	1	BRA2S3786_20160216_081000.wav	0.0	3.0	150	15000	rebcho1	Red-billed Chough	0.7278449960042371	1
+4	Spectrogram 1	1	BRA2S3786_20160216_081000.wav	0.0	3.0	150	15000	grnher	Green Heron	0.17171076752742206	2

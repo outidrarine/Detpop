@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_221000.wav	3.0	6.0	150	15000	bacspa	Bachman's Sparrow	0.5152105394936289	1
+2	Spectrogram 1	1	BRA2S3786_20160216_221000.wav	3.0	6.0	150	15000	whtspa	White-throated Sparrow	0.3309868206561899	2
+3	Spectrogram 1	1	BRA2S3786_20160216_221000.wav	3.0	6.0	150	15000	brwhaw	Broad-winged Hawk	0.18479214317155077	3
+4	Spectrogram 1	1	BRA2S3786_20160216_221000.wav	0.0	3.0	150	15000	whtspa	White-throated Sparrow	0.5873932772221123	1
+5	Spectrogram 1	1	BRA2S3786_20160216_221000.wav	0.0	3.0	150	15000	chwwid	Chuck-will's-widow	0.40702398778362714	2

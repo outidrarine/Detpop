@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_094000.wav	3.0	6.0	150	15000	y00475	American Coot	0.3596389016024803	1
+2	Spectrogram 1	1	BRA2S3786_20160216_094000.wav	3.0	6.0	150	15000	purgal2	Purple Gallinule	0.17802107940213258	2
+3	Spectrogram 1	1	BRA2S3786_20160216_094000.wav	0.0	3.0	150	15000	moudov	Mourning Dove	0.2056185937640227	1

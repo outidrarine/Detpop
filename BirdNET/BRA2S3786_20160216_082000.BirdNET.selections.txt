@@ -1,0 +1,5 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_082000.wav	3.0	6.0	150	15000	whtdov	White-tipped Dove	0.7270402339171391	1
+2	Spectrogram 1	1	BRA2S3786_20160216_082000.wav	3.0	6.0	150	15000	moudov	Mourning Dove	0.2742550744597058	2
+3	Spectrogram 1	1	BRA2S3786_20160216_082000.wav	0.0	3.0	150	15000	purmar	Purple Martin	0.9276515270500589	1
+4	Spectrogram 1	1	BRA2S3786_20160216_082000.wav	0.0	3.0	150	15000	whtdov	White-tipped Dove	0.1106532161556634	2

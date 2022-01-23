@@ -1,0 +1,7 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_171000.wav	3.0	6.0	150	15000	audori	Audubon's Oriole	0.251160429653774	1
+2	Spectrogram 1	1	BRA2S3786_20160216_171000.wav	3.0	6.0	150	15000	????	Human	0.17613977420433244	2
+3	Spectrogram 1	1	BRA2S3786_20160216_171000.wav	3.0	6.0	150	15000	nswowl	Northern Saw-whet Owl	0.137403157533044	3
+4	Spectrogram 1	1	BRA2S3786_20160216_171000.wav	0.0	3.0	150	15000	eurcur	Eurasian Curlew	0.3485510737831152	1
+5	Spectrogram 1	1	BRA2S3786_20160216_171000.wav	0.0	3.0	150	15000	????	Human	0.2483174406900516	2
+6	Spectrogram 1	1	BRA2S3786_20160216_171000.wav	0.0	3.0	150	15000	comloo	Common Loon	0.2459555897682441	3

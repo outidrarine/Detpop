@@ -1,0 +1,5 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_160000.wav	3.0	6.0	150	15000	cliswa	Cliff Swallow	0.709034577775252	1
+2	Spectrogram 1	1	BRA2S3786_20160215_160000.wav	3.0	6.0	150	15000	blkter	Black Tern	0.1264111340944572	2
+3	Spectrogram 1	1	BRA2S3786_20160215_160000.wav	0.0	3.0	150	15000	moudov	Mourning Dove	0.1377600967270046	1
+4	Spectrogram 1	1	BRA2S3786_20160215_160000.wav	0.0	3.0	150	15000	houfin	House Finch	0.12290113156826038	2

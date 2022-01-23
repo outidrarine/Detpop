@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160215_174000.wav	3.0	6.0	150	15000	gryjay	Canada Jay	0.2574578653988489	1
+2	Spectrogram 1	1	BRA2S3786_20160215_174000.wav	3.0	6.0	150	15000	gamqua	Gambel's Quail	0.2331491827033499	2
+3	Spectrogram 1	1	BRA2S3786_20160215_174000.wav	3.0	6.0	150	15000	phaino	Phainopepla	0.1445212626061162	3

@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_045000.wav	3.0	6.0	150	15000	pingro	Pine Grosbeak	0.4334257918861566	1
+2	Spectrogram 1	1	BRA2S3786_20160214_045000.wav	3.0	6.0	150	15000	greyel	Greater Yellowlegs	0.2082309437712095	2
+3	Spectrogram 1	1	BRA2S3786_20160214_045000.wav	0.0	3.0	150	15000	whtkin2	White-throated Kingfisher	0.46483868986906896	1
+4	Spectrogram 1	1	BRA2S3786_20160214_045000.wav	0.0	3.0	150	15000	greyel	Greater Yellowlegs	0.22284451522841198	2
+5	Spectrogram 1	1	BRA2S3786_20160214_045000.wav	0.0	3.0	150	15000	astfly	Ash-throated Flycatcher	0.18229304376826105	3

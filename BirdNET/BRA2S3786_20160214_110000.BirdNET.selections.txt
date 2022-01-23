@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_110000.wav	0.0	3.0	150	15000	bubhum	Buff-bellied Hummingbird	0.3486709124782391	1
+2	Spectrogram 1	1	BRA2S3786_20160214_110000.wav	0.0	3.0	150	15000	bacspa	Bachman's Sparrow	0.2161473448119357	2
+3	Spectrogram 1	1	BRA2S3786_20160214_110000.wav	0.0	3.0	150	15000	savspa	Savannah Sparrow	0.15008779673169972	3

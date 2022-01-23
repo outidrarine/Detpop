@@ -1,0 +1,5 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_091000.wav	3.0	6.0	150	15000	trokin	Tropical Kingbird	0.3310505657542688	1
+2	Spectrogram 1	1	BRA2S3786_20160216_091000.wav	3.0	6.0	150	15000	blkpho	Black Phoebe	0.2910906691055691	2
+3	Spectrogram 1	1	BRA2S3786_20160216_091000.wav	3.0	6.0	150	15000	pygnut	Pygmy Nuthatch	0.1743949639446223	3
+4	Spectrogram 1	1	BRA2S3786_20160216_091000.wav	0.0	3.0	150	15000	combul2	Common Bulbul	0.8166419524258545	1

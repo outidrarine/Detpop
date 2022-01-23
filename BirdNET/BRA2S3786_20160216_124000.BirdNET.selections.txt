@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_124000.wav	3.0	6.0	150	15000	bncfly	Brown-crested Flycatcher	0.6109267727652887	1
+2	Spectrogram 1	1	BRA2S3786_20160216_124000.wav	3.0	6.0	150	15000	grcfly	Great Crested Flycatcher	0.24592083387333724	2
+3	Spectrogram 1	1	BRA2S3786_20160216_124000.wav	3.0	6.0	150	15000	norcar	Northern Cardinal	0.23343367042082358	3

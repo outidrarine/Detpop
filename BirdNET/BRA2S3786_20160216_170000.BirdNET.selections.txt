@@ -1,0 +1,5 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160216_170000.wav	3.0	6.0	150	15000	eupowl1	Eurasian Pygmy-Owl	0.21447240396094938	1
+2	Spectrogram 1	1	BRA2S3786_20160216_170000.wav	3.0	6.0	150	15000	eursco1	Eurasian Scops-Owl	0.17583046011549164	2
+3	Spectrogram 1	1	BRA2S3786_20160216_170000.wav	0.0	3.0	150	15000	whtdov	White-tipped Dove	0.9808668838047928	1
+4	Spectrogram 1	1	BRA2S3786_20160216_170000.wav	0.0	3.0	150	15000	moudov	Mourning Dove	0.3135397201282682	2

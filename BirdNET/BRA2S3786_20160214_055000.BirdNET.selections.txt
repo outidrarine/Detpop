@@ -1,0 +1,3 @@
+Selection	View	Channel	Begin File	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Species Code	Common Name	Confidence	Rank
+1	Spectrogram 1	1	BRA2S3786_20160214_055000.wav	3.0	6.0	150	15000	eursta	European Starling	0.22413149132225307	1
+2	Spectrogram 1	1	BRA2S3786_20160214_055000.wav	3.0	6.0	150	15000	brebla	Brewer's Blackbird	0.17869698829813915	2
