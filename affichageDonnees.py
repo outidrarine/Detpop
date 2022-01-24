@@ -185,10 +185,12 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
     # Initialisation
     average_pertinences = {}
     average_similarities = {}
+    average_birds = {}
 
     for sampling_name in sampling_names:
         average_pertinences[sampling_name] = np.zeros(nbSamplings)
         average_similarities[sampling_name] = np.zeros(nbSamplings)
+        average_birds[sampling_name] = np.zeros(nbSamplings)
 
     # Calculs
     for s in range(nbSamplings):
@@ -204,6 +206,7 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
             sampling_name = sampling_names[k]
             average_pertinences[sampling_name][s] = np.mean(compute_sample_pertinence(samples, root)['pertinence'])
             average_similarities[sampling_name][s] = compute_average_similaritiy(samples, root)
+            average_birds[sampling_name][s] = len(extract_birds(samples,'./BirdNET'))
 
     # Affichage des résultats
     cols_names = ['Pertinences', 'Similarities']
@@ -225,6 +228,7 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
 
         print("Average pertinence : ", np.mean(average_pertinences[sampling_name]))
         print("Average similarity : ", np.mean(average_similarities[sampling_name]))
+        print("average birds count : ", np.mean(average_birds[sampling_name]))
 
         print()
 
@@ -233,3 +237,4 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
         axes[k, 1].hist(average_similarities[sampling_name], bins = 40, range = (0, 1))
 
     plt.show()
+    
