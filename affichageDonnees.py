@@ -5,6 +5,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
+import os
+import csv
+
 
 from utils import getDateFromFilename, getPositionOfFilename, getAllDates, extract_birds
 from constructionPsi import compute_sample_pertinence, compute_average_similaritiy, get_all_pertinence, similarity_all, getpsi
@@ -180,7 +183,7 @@ def scatter_over_similarity(similarities, dates, indexes=[], nbSounds = 432 ):
 
 # Comparaison d'échantillonages
 
-def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase'):
+def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase', persiste_samples = False):
 
     # Initialisation
     average_pertinences = {}
@@ -207,6 +210,10 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
             average_pertinences[sampling_name][s] = np.mean(compute_sample_pertinence(samples, root)['pertinence'])
             average_similarities[sampling_name][s] = compute_average_similaritiy(samples, root)
             average_birds[sampling_name][s] = len(extract_birds(samples,'./BirdNET'))
+            
+            # writing data to text file
+            if(persiste_samples):
+                exportSamplesToFiles(sampling_name, samples, s)
 
     # Affichage des résultats
     cols_names = ['Pertinences', 'Similarities']
@@ -238,3 +245,12 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
 
     plt.show()
     
+def exportSamplesToFiles(sampling_name, samples, s):
+    path = "./Results/" + sampling_name + "/"
+    isExist = os.path.exists(path)
+    if not isExist:
+        os.makedirs(path)
+    f = open(path + str(s) + ".txt","w+") # creating 1.txt, 2.txt etc...
+    write = csv.writer(f)
+    write.writerow(samples)
+    f.close()
