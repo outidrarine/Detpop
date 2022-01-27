@@ -26,13 +26,14 @@ def displaySpectrogram(sound, fs, title, ax):
 
 # Representation temporelle
 
-def displaySound(sound, duration, fs, title, ax):
+def displaySound(sound, fs, duration, title, ax):
 
     t = np.linspace(0, duration, duration * fs)
 
     ax.plot(t, sound)
     ax.set_xlabel("Time [sec]")
     ax.set_ylabel("Amplitude")
+    ax.set_ylim([-20000, 20000])
     ax.title.set_text(title)
 
 
