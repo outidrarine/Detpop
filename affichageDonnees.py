@@ -9,7 +9,7 @@ import os
 import csv
 
 
-from utils import getDateFromFilename, getPositionOfFilename, getAllDates, extract_birds
+from utils import getDateFromFilename, getPositionOfFilename, getAllDates, extract_birds, getPositionsOfFilenames
 from constructionPsi import compute_sample_pertinence, compute_average_similaritiy, get_all_pertinence, similarity_all, getpsi
 
 # Spectrogramme
@@ -77,11 +77,100 @@ def displayPolarSamples(samples):
     plt.show()
 
 
+# Tracé de la pertinence
+
+def displayPertinences(exagerated = False, samples = [], root = './SoundDatabase'):
+
+    q = get_all_pertinence(verbose = False)
+    q.sort(order = 'file')
+
+    nbSounds = len(q)
+
+    # Tracé de la courbe des pertinences en fonction du temps
+
+    plt.figure(figsize = (15, 7))
+
+    if exagerated:
+        plt.plot(1/(1 - q['pertinence']))
+        mean_pertinence = np.mean(1 / (1 - q['pertinence']))
+        max_pertinence = np.max(1 / (1 - q['pertinence']))
+    else:
+        plt.plot(q['pertinence'])
+        mean_pertinence = np.mean(q['pertinence'])
+        max_pertinence = np.max(q['pertinence'])
+    
+    dates = ['midnight', 'noon', 'midnight', 'noon', 'midnight', 'noon', 'midnight']
+    plt.xticks([nbSounds/6 * k for k in range(7)], dates)
+    plt.ylabel('Pertinence')
+    
+    plt.hlines(mean_pertinence, 0, nbSounds, 'r')
+    plt.vlines([nbSounds/3 * k for k in range(4)], 0, max_pertinence, 'g', ':')
+
+    # Affichages de points sur la courbe
+
+    scatter_over_pertinence(q, root, samples, exagerated)
+
+
+# Indique les échantillons selectionnés par un échantillonage dans la courbe des pertinences
+
+def scatter_over_pertinence(q, root, samples=[], exagerated = False):
+
+    places = getPositionsOfFilenames(root, samples)
+
+    if exagerated:
+        plt.scatter(places, 1 / (1 - q['pertinence'][places]), 50, marker='x', color = 'r')
+    else:
+        plt.scatter(places, q['pertinence'][places], 50, marker='x', color = 'r')
+
+
+# Tracé de la matrice des similarités
+
+def displaySimilarities(samples = [], root = './SoundDatabase'):
+
+    psi = getpsi(verbose = False)
+    similarities = similarity_all(psi)
+
+    nbSounds = similarities.shape[0]
+
+    # Affichage de la matrice des similarités
+
+    plt.figure(figsize=(8, 8))
+
+    ax = plt.axes([0, 0.05, 0.9, 0.9])
+    ax.grid(False)
+    ax.set_title("Similarités")
+
+    im = ax.imshow((similarities - np.min(similarities))/(np.max(similarities) - np.min(similarities)), cmap = 'viridis')
+
+    # Affichages de points sur l'image
+
+    scatter_over_similarity(root, samples)
+
+    # Afficages des labels sur les axes
+
+    dates = ['midnight', 'noon', 'midnight', 'noon', 'midnight', 'noon', 'midnight']
+    plt.xticks([nbSounds/6 * k for k in range(7)], labels = dates)
+    plt.yticks([nbSounds/6 * k for k in range(7)], labels = dates)
+
+    # Affichage de la colorbar
+
+    cax = plt.axes([0.95, 0.05, 0.05, 0.9])
+    plt.colorbar(mappable = im, cax = cax)
+
+
+# Indique les échantillons selectionnés par un échantillonage dans la matrice des similarités
+
+def scatter_over_similarity(root, samples=[]):
+    
+    places = getPositionsOfFilenames(root, samples)
+    plt.scatter(places, places, 200, marker='x', color = 'r')
+
+
 # Affichages d'informations sur un echantillonages
 
-def present_sampling(sampling_function, nbSamples):
+def present_sampling(sampling_function, nbSamples, exagerated_pertinences = False):
 
-    # Initilaisation et calculs
+    # Initialisation et calculs
     root = './SoundDatabase'
     samples = sampling_function(nbSamples)
 
@@ -103,87 +192,20 @@ def present_sampling(sampling_function, nbSamples):
     displayPolarSamples(samples)
 
     # Affichage sur figure pertinences
-    q = get_all_pertinence(verbose = False)
-    q.sort(order = 'file')
-
-    dates = getAllDates(root, with_year = False)
-
-    scatter_over_pertinence(q, dates, samples)
+    displayPertinences(exagerated_pertinences, samples)
 
     # Affichage sur figure similarités
-    psi = getpsi(verbose = False)
-
-    similarities = similarity_all(psi)
-
-    scatter_over_similarity(similarities, dates, indexes = samples)
+    displaySimilarities(samples)
 
     # Extraction des oiseaux 
     birds_set = extract_birds(samples,'./BirdNET')
     print('Extraction of birds from those samples :',len(birds_set))
     print(birds_set)
 
-    
-
-
-# Indiquer les échantillons selectionnés par un échantillonage dans la courbe des pertinences
-
-def scatter_over_pertinence(q, dates, indexes=[], nbSounds = 432):
-    
-    step = 20
-    dates = dates[::step]
-
-    fig = plt.figure(figsize = (15, 7))
-    plt.plot(q['pertinence'])
-    
-    mean_pertinence = np.mean(q['pertinence'])
-    
-    plt.pause
-    plt.plot([0, len(q)],[mean_pertinence, mean_pertinence])
-    
-    for index in indexes:
-        place = getPositionOfFilename('./SoundDatabase', index)
-        plt.pause
-        plt.scatter(place, q['pertinence'][place], 50, marker='x', color = 'r')
-    
-    plt.xticks(np.arange(0, nbSounds, step = step), dates, rotation = 90)
-    plt.ylabel("Pertinence")
-    
-    plt.show()
-
-
-# Indiquer les échantillons selectionnés par un échantillonage dans la courbe des similarités
-
-def scatter_over_similarity(similarities, dates, indexes=[], nbSounds = 432 ):
-    
-    step = 20
-
-    dates = dates[::step]
-
-    plt.figure(figsize=(8, 8))
-
-    ax = plt.axes([0, 0.05, 0.9, 0.9 ])
-    ax.grid(False)
-    ax.set_title("Similarités")
-
-    im = ax.imshow((similarities - np.min(similarities))/(np.max(similarities) - np.min(similarities)), cmap = 'viridis')
-
-    plt.xticks(np.arange(0, nbSounds, step = step), dates, rotation = 90)
-    plt.yticks(np.arange(0, nbSounds, step = step), dates, rotation = 0)
-
-    for index in indexes:
-        place = getPositionOfFilename('./SoundDatabase', index)
-        plt.pause
-        plt.scatter(place, place, 200, marker='x', color = 'r')
-
-    cax = plt.axes([0.95, 0.05, 0.05,0.9 ])
-    
-    plt.colorbar(mappable=im, cax=cax)
-    plt.show()
-
 
 # Comparaison d'échantillonages
 
-def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase', persiste_samples = False):
+def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase', persist_samples = False):
 
     # Initialisation
     average_pertinences = {}
@@ -198,7 +220,7 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
     # Calculs
     for s in range(nbSamplings):
 
-        # Afficahge de la progression
+        # Affichage de la progression
         sys.stdout.write('\r')
         sys.stdout.write("[%-100s] %d%%" % ('='*round(s / (nbSamplings - 1) * 100), 100*s/(nbSamplings - 1)))
         sys.stdout.flush()
@@ -212,7 +234,7 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
             average_birds[sampling_name][s] = len(extract_birds(samples,'./BirdNET'))
             
             # writing data to text file
-            if(persiste_samples):
+            if(persist_samples):
                 exportSamplesToFiles(sampling_name, samples, s)
 
     # Affichage des résultats
@@ -244,7 +266,8 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
         axes[k, 1].hist(average_similarities[sampling_name], bins = 40, range = (0, 1))
 
     plt.show()
-    
+
+
 def exportSamplesToFiles(sampling_name, samples, s):
     path = "./Results/" + sampling_name + "/"
     isExist = os.path.exists(path)

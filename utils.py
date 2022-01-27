@@ -103,6 +103,8 @@ def getAllDates(root, with_year = True):
         for f in filenames:
             dates.append(getDateFromFilename(f, with_year = with_year))
     return dates
+
+
 # Extract set of birds from samples
 def extract_birds(samples, root):
     for root, dirnames, filenames in os.walk(root):
