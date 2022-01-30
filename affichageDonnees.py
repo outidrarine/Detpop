@@ -9,7 +9,7 @@ import os
 import csv
 
 
-from utils import getDateFromFilename, getPositionOfFilename, getAllDates, extract_birds, getPositionsOfFilenames
+from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
 from constructionPsi import compute_sample_pertinence, compute_average_similaritiy, get_all_pertinence, similarity_all, getpsi
 
 # SPECTROGRAMME
@@ -206,7 +206,7 @@ def present_sampling(sampling_function, nbSamples, exagerated_pertinences = Fals
 
 # COMPARAISON D'ÉCHANTILLONAGES
 
-def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase', clouds_alpha = 0.2, pareto = True):
+def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase', clouds_alpha = 0.3, pareto = True):
 
     # Calculs des échantillonages
     average_pertinences, average_similarities, average_birds = compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = root)
@@ -218,7 +218,7 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
     displaySamplingsHistograms(sampling_names, average_pertinences, average_similarities)
 
     # Affichage des nuages de points des échantillonnages
-    displaySamplingClouds(sampling_names, nbSamples, average_pertinences, average_similarities, clouds_alpha, pareto = pareto)
+    displaySamplingClouds(sampling_names, nbSamplings, average_pertinences, average_similarities, clouds_alpha, pareto = pareto)
 
 
 # CALCUL DES ECHANTILLONNAGES POUR UNE LISTE D'ECHANTILLONNEURS
@@ -306,9 +306,9 @@ def displaySamplingsHistograms(sampling_names, average_pertinences, average_simi
 
 # REPRÉSENTATION DIVERSITÉ/PERTINENCE DES ÉCHANTILLONNAGES
 
-def displaySamplingClouds(sampling_names, nbSamples, average_pertinences, average_similarities, alpha, pareto = True):
+def displaySamplingClouds(sampling_names, nbSamplings, average_pertinences, average_similarities, alpha, pareto = True):
 
-    plt.figure(figsize=(7, 7))
+    plt.figure(figsize=(10, 10))
 
     for k, sampling_name in enumerate(sampling_names):
         plt.scatter(average_pertinences[sampling_name], 1 - average_similarities[sampling_name], alpha = alpha)
@@ -325,30 +325,47 @@ def displaySamplingClouds(sampling_names, nbSamples, average_pertinences, averag
 
         listX = np.block([average_pertinences[sampling_name] for sampling_name in sampling_names])
         listY = 1 - np.block([average_similarities[sampling_name] for sampling_name in sampling_names])
+        listSampling = np.block([np.array([sampling_name] * nbSamplings) for sampling_name in sampling_names])   
 
-        paretoPointsX, paretoPointsY = findParetoPoints(listX, listY)
+        paretoPointsX, paretoPointsY, paretoPointsSampling = findParetoPoints(listX, listY, listSampling)
 
-        plt.plot(paretoPointsX, paretoPointsY, color = 'r')
+        plt.plot(paretoPointsX, paretoPointsY, color = 'r', linestyle = ':')
 
-    plt.show()
+        plt.show()
+        
+        nbParetoPoints = {}
+        for sampling_name in sampling_names:
+            nbParetoPoints[sampling_name] = 0
+
+        for sampling_name in paretoPointsSampling:
+            nbParetoPoints[sampling_name] += 1
+        
+        print("Number of points in the Pareto front per sampling")
+        for sampling_name in sampling_names:
+            print(sampling_name, ":", nbParetoPoints[sampling_name])
+
+    else:
+        plt.show()
 
 
 # RECHERCHE DES POINTS DU FRONT DE PARETO
 
-def findParetoPoints(listX, listY):
+def findParetoPoints(listX, listY, listSampling):
 
-    sortedPairs = sorted([[listX[i], listY[i]] for i in range(len(listX))], reverse = True)
+    sortedPairs = sorted([[listX[i], listY[i], listSampling[i]] for i in range(len(listX))], reverse = True)
 
     paretoPoints = [sortedPairs[0]]    
     
-    for pair in sortedPairs[1:]:
-        if pair[1] >= paretoPoints[-1][1]:
-            paretoPoints.append(pair)
+    for point in sortedPairs[1:]:
+        if point[1] >= paretoPoints[-1][1]:
+            paretoPoints.append(point)
 
-    paretoPointsX = [pair[0] for pair in paretoPoints]
-    paretoPointsY = [pair[1] for pair in paretoPoints]
+    paretoPointsX = [point[0] for point in paretoPoints]
+    paretoPointsY = [point[1] for point in paretoPoints]
+    paretoPointsSampling = [point[2] for point in paretoPoints]
 
-    return paretoPointsX, paretoPointsY
+
+    return paretoPointsX, paretoPointsY, paretoPointsSampling
 
 
 # ENREGISTREMENT DES ÉCHANTILLONAGES DANS DES FICHIERS CSV

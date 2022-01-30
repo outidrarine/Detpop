@@ -32,9 +32,6 @@ def compute_all_pertinence(root, duration = 5, nbSounds = 432, dtype = None):
             filename = os.path.join(root, f)
             sound, fe = getSound(filename, duration)
             q[k] = f, compute_pertinence(sound, fe)
-            k += 1
-   
-    q.sort(order = 'pertinence')
 
     return q
 

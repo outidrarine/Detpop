@@ -10,14 +10,21 @@ from utils import getFilenamesAtPositions
 
 # Echantillonage par pertinence
 
-def sampling_pertinence(nbSamples, shuffling = True):
+def sampling_pertinence(nbSamples, takeMax = False, root = './SoundDatabase'):
 
     q = get_all_pertinence(verbose = False)
 
-    samples = q['file'][-nbSamples:]
+    if takeMax:
 
-    if shuffling:
-        np.random.shuffle(np.array(samples))
+        q.sort(order = 'pertinence')
+        samples = q['file'][-nbSamples:]
+
+    else:
+
+        nbSounds = len(q['file'])
+        q.sort(order = 'file')
+        samplesPositions = np.random.choice(np.arange(0, nbSounds), p = q['pertinence'] / np.sum(q['pertinence']), size = nbSamples)
+        samples = getFilenamesAtPositions(root, samplesPositions)
 
     return samples
 
