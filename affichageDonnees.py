@@ -11,7 +11,7 @@ import csv
 
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
-from constructionPsi import compute_sample_pertinence, compute_average_similaritiy, get_all_pertinence, similarity_all, getpsi
+from constructionPsi import compute_all_pertinence, compute_sample_pertinence, compute_average_similaritiy, get_all_pertinence, similarity_all, getpsi
 from echantillonnages import compute_criteria
 
 # SPECTROGRAMME
@@ -58,7 +58,7 @@ def displayPolarSamples(samples):
 
         samplesPerDay[day].append(time)
     
-    fig = plt.figure(figsize =(10, 10))
+    fig = plt.figure(figsize =(6, 6))
 
     colors = ['r', 'g', 'b']
     ax = plt.subplot(111, projection='polar')
@@ -67,13 +67,13 @@ def displayPolarSamples(samples):
     ax.set_thetagrids((0, 90, 180, 270), labels = ('0', '6', '12', '18'))
     ax.grid(False)
     ax.set_rgrids([])
-    ax.set_rlim(0.9)
-    ax.set_rmax(1.005)
+    ax.set_rlim(0.3)
+    ax.set_rmax(0.4)
    
 
     for k, day in enumerate(samplesPerDay):
         theta = np.array(samplesPerDay[day]) * 360 / 1440
-        ax.plot(theta, np.ones(theta.shape), colors[k] + 'o', label = day)
+        ax.plot(theta, 0.39 * np.ones(theta.shape), colors[k] + 'o', label = day, markersize = 8)
     
     plt.title("Répartition temporelle des échantillons")
     plt.legend()
@@ -228,7 +228,7 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, colo
 
 # CALCUL DES ECHANTILLONNAGES POUR UNE LISTE D'ECHANTILLONNEURS
 
-def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase', persist_samples = False):
+def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase', persist_samples = False, normalized = True):
 
     # Initialisation
     average_pertinences = np.array(np.zeros(nbSamplings), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
@@ -236,6 +236,15 @@ def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, roo
     average_birds = np.array(np.zeros(nbSamplings), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
     criteria = np.array(np.zeros(nbSamplings), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
 
+    if (normalized):
+
+        q = get_all_pertinence(verbose = False)
+        min_pertinence = np.min(q['pertinence'])
+        max_pertinence = np.max(q['pertinence'])
+
+        s = similarity_all(getpsi(verbose = False))
+        min_similarity = np.min(s)
+        max_similarity = np.max(s - 10 * np.eye(s.shape[0]))
 
     # Calculs
     for s in range(nbSamplings):
@@ -246,8 +255,14 @@ def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, roo
             
             samples = sampling(nbSamples)
             sampling_name = sampling_names[k]
+
             average_pertinences[sampling_name][s] = np.mean(compute_sample_pertinence(samples, root)['pertinence'])
             average_similarities[sampling_name][s] = compute_average_similaritiy(samples, root)
+
+            if (normalized):
+                average_pertinences[sampling_name][s] = (average_pertinences[sampling_name][s] - min_pertinence) / (max_pertinence - min_pertinence)
+                average_similarities[sampling_name][s] = (average_similarities[sampling_name][s] - min_similarity) / (max_similarity - min_similarity)
+
             average_birds[sampling_name][s] = len(extract_birds(samples,'./BirdNET'))
             criteria[sampling_name][s] = compute_criteria(sampling_name, samples, average_pertinences[sampling_name][s], average_similarities[sampling_name][s])
             
@@ -256,6 +271,7 @@ def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, roo
                 exportSamplesToFiles(sampling_name, samples, s)
     
     return average_pertinences, average_similarities, average_birds, criteria
+
 
 # AFFICHAGE D'UNE BARRE DE PROGRESSION
 
@@ -286,7 +302,7 @@ def displaySamplingsAverages(sampling_names, average_pertinences, average_simila
 
 def displaySamplingsHistograms(sampling_names, average_pertinences, average_similarities):
     
-    cols_names = ['Pertinences', 'Similarities']
+    cols_names = ['Pertinence', 'Diversity']
     rows_names = sampling_names
 
     _, axes = plt.subplots(len(sampling_names), 2, figsize=(12, 8))
@@ -301,8 +317,9 @@ def displaySamplingsHistograms(sampling_names, average_pertinences, average_simi
 
         axes[k, 0].hist(average_pertinences[sampling_name], bins = 40, range = (0, 1))
 
-        axes[k, 1].hist(average_similarities[sampling_name], bins = 40, range = (0, 1))
+        axes[k, 1].hist(1 - average_similarities[sampling_name], bins = 40, range = (0, 1))
 
+    plt.suptitle("Pertinences et diversities per samplings")
     plt.show()
 
 
@@ -322,6 +339,8 @@ def displaySamplingClouds(sampling_names, nbSamplings, average_pertinences, aver
     plt.ylabel("Diversité")
     
     plt.legend(sampling_names)
+
+    plt.title("Samplings repartition in the pertinence/diversity plan")
 
     if pareto:
 
@@ -401,6 +420,7 @@ def displayBestOfN(sampling_names, average_pertinences, average_similarities, cr
         patch.append(patches.Patch(color = color, label = sampling_names[k]))
     
     plt.legend(handles = patch)
+    plt.title("Best of N samplings")
 
 
 # CALCUL DU MEILLEUR ECHANTILLONAGE PARMI N SELON LE CRITERE
