@@ -3,6 +3,7 @@
 import sys
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib import patches
 from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
 import os
@@ -11,6 +12,7 @@ import csv
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
 from constructionPsi import compute_sample_pertinence, compute_average_similaritiy, get_all_pertinence, similarity_all, getpsi
+from echantillonnages import compute_criteria
 
 # SPECTROGRAMME
 
@@ -206,10 +208,10 @@ def present_sampling(sampling_function, nbSamples, exagerated_pertinences = Fals
 
 # COMPARAISON D'ÉCHANTILLONAGES
 
-def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase', clouds_alpha = 0.3, pareto = True):
+def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, color_list, root = './SoundDatabase', clouds_alpha = 0.3, pareto = True, bestOfN_step = 20):
 
     # Calculs des échantillonages
-    average_pertinences, average_similarities, average_birds = compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = root)
+    average_pertinences, average_similarities, average_birds, criteria = compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = root)
 
     # Affichages des valeurs moyennes
     displaySamplingsAverages(sampling_names, average_pertinences, average_similarities, average_birds)
@@ -218,7 +220,10 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
     displaySamplingsHistograms(sampling_names, average_pertinences, average_similarities)
 
     # Affichage des nuages de points des échantillonnages
-    displaySamplingClouds(sampling_names, nbSamplings, average_pertinences, average_similarities, clouds_alpha, pareto = pareto)
+    displaySamplingClouds(sampling_names, nbSamplings, average_pertinences, average_similarities, clouds_alpha, color_list, pareto = pareto)
+
+    # Affichage des best of N
+    displayBestOfN(sampling_names, average_pertinences, average_similarities, criteria, bestOfN_step, nbSamplings, color_list)
 
 
 # CALCUL DES ECHANTILLONNAGES POUR UNE LISTE D'ECHANTILLONNEURS
@@ -226,14 +231,11 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, root
 def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase', persist_samples = False):
 
     # Initialisation
-    average_pertinences = {}
-    average_similarities = {}
-    average_birds = {}
+    average_pertinences = np.array(np.zeros(nbSamplings), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+    average_similarities = np.array(np.zeros(nbSamplings), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+    average_birds = np.array(np.zeros(nbSamplings), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+    criteria = np.array(np.zeros(nbSamplings), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
 
-    for sampling_name in sampling_names:
-        average_pertinences[sampling_name] = np.zeros(nbSamplings)
-        average_similarities[sampling_name] = np.zeros(nbSamplings)
-        average_birds[sampling_name] = np.zeros(nbSamplings)
 
     # Calculs
     for s in range(nbSamplings):
@@ -247,13 +249,13 @@ def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, roo
             average_pertinences[sampling_name][s] = np.mean(compute_sample_pertinence(samples, root)['pertinence'])
             average_similarities[sampling_name][s] = compute_average_similaritiy(samples, root)
             average_birds[sampling_name][s] = len(extract_birds(samples,'./BirdNET'))
+            criteria[sampling_name][s] = compute_criteria(sampling_name, samples, average_pertinences[sampling_name][s], average_similarities[sampling_name][s])
             
             # writing data to text file
             if(persist_samples):
                 exportSamplesToFiles(sampling_name, samples, s)
     
-    return average_pertinences, average_similarities, average_birds
-
+    return average_pertinences, average_similarities, average_birds, criteria
 
 # AFFICHAGE D'UNE BARRE DE PROGRESSION
 
@@ -306,12 +308,12 @@ def displaySamplingsHistograms(sampling_names, average_pertinences, average_simi
 
 # REPRÉSENTATION DIVERSITÉ/PERTINENCE DES ÉCHANTILLONNAGES
 
-def displaySamplingClouds(sampling_names, nbSamplings, average_pertinences, average_similarities, alpha, pareto = True):
+def displaySamplingClouds(sampling_names, nbSamplings, average_pertinences, average_similarities, alpha, color_list, pareto = True):
 
     plt.figure(figsize=(10, 10))
 
     for k, sampling_name in enumerate(sampling_names):
-        plt.scatter(average_pertinences[sampling_name], 1 - average_similarities[sampling_name], alpha = alpha)
+        plt.scatter(average_pertinences[sampling_name], 1 - average_similarities[sampling_name], alpha = alpha, color = color_list[k])
 
     plt.xlim(0, 1)
     plt.ylim(0, 1)
@@ -366,6 +368,57 @@ def findParetoPoints(listX, listY, listSampling):
 
 
     return paretoPointsX, paretoPointsY, paretoPointsSampling
+
+
+# AFFICHAGE DES BEST OF N
+
+def displayBestOfN(sampling_names, average_pertinences, average_similarities, criteria, stepN, Nmax, color_list):
+
+    plt.figure(figsize=(10, 10))
+
+    bestOfN = computeBestOfN(sampling_names, average_pertinences, average_similarities, criteria, stepN, Nmax)
+
+    for i, sampling_name in enumerate(sampling_names):
+
+        listX = bestOfN[sampling_name][0]
+        listY = bestOfN[sampling_name][1]
+        
+        # for k in range(len(listX) - 1):
+        #     plt.arrow(listX[k], listY[k], listX[k + 1] - listX[k], listY[k + 1] - listY[k], color = color_list[i])
+        
+        plt.plot(listX, listY, color = color_list[i], marker = 'o')
+        plt.scatter(listX[0], listY[0], color = color_list[i], marker = 'D')
+        plt.scatter(listX[-1], listY[-1], color = color_list[i], marker = '*')
+
+    plt.xlim(0, 1)
+    plt.ylim(0, 1)
+
+    plt.xlabel("Pertinence")
+    plt.ylabel("Diversité")
+
+    patch = []
+    for k, color in enumerate(color_list):
+        patch.append(patches.Patch(color = color, label = sampling_names[k]))
+    
+    plt.legend(handles = patch)
+
+
+# CALCUL DU MEILLEUR ECHANTILLONAGE PARMI N SELON LE CRITERE
+
+def computeBestOfN(sampling_names, average_pertinences, average_similarities, criteria, stepN, Nmax):
+
+    listN = np.arange(1, Nmax, stepN)
+    bestOfN = np.array(np.zeros((2, len(listN))), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+
+    for k, N in enumerate(listN):
+        for sampling_name in sampling_names:
+
+            ind_max = np.argmax(criteria[sampling_name][0:N])
+            x = average_pertinences[sampling_name][ind_max]
+            y = 1 - average_similarities[sampling_name][ind_max]
+            bestOfN[sampling_name][:, k] = x, y
+    
+    return bestOfN
 
 
 # ENREGISTREMENT DES ÉCHANTILLONAGES DANS DES FICHIERS CSV
