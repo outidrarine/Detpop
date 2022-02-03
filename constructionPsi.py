@@ -16,7 +16,7 @@ from utils import getPositionsOfFilenames, getSound
 def compute_pertinence(sound, fe):
     Spec, tn, fn, _ = spectrogram(sound, fe)
     q = tfsd(Spec, fn, tn)
-    return np.sqrt(q)
+    return q
 
 
 def compute_all_pertinence(root, duration = 5, nbSounds = 432, dtype = None):
@@ -32,6 +32,7 @@ def compute_all_pertinence(root, duration = 5, nbSounds = 432, dtype = None):
             filename = os.path.join(root, f)
             sound, fe = getSound(filename, duration)
             q[k] = f, compute_pertinence(sound, fe)
+            k += 1
 
     return q
 
@@ -75,6 +76,7 @@ def get_all_pertinence(verbose = True):
 
         dt = ([('file', h5py.string_dtype('utf-8', 29)), ('pertinence', float)])
         q = compute_all_pertinence('./SoundDatabase', dtype = dt)
+
         persisted_all_pertinence.create_dataset('all_pertinence', data = q, dtype = dt)
 
         dtype = np.dtype([('file', str, 29), ('pertinence', np.float64)])
@@ -131,7 +133,7 @@ def compute_PSI(root, J, Q, duration, nbSounds, verbose = True):
             sound, fe = getSound(filename, duration)
             q = compute_pertinence(sound, fe)
             d = compute_descriptor(sound, J, Q)
-            psi[k] = q*d
+            psi[k] = np.sqrt(q)*d
             k += 1
     if verbose:    
         print("DONE")
@@ -139,20 +141,21 @@ def compute_PSI(root, J, Q, duration, nbSounds, verbose = True):
     return np.array(psi)
 
 
-def getpsi(verbose = True):
+def getpsi(J = 8, Q = 3, verbose = True, root = './SoundDatabase'):
 
     persisted_psi = h5py.File("./persisted_data/psi.hdf5", "a")
 
-    if 'psi_1' in persisted_psi:
+    psi_name = "psi_{}_{}".format(J, Q)
+
+    if psi_name in persisted_psi:
         if verbose:
-            print("loading psi from persisted file")
-        psi = persisted_psi['psi_1'][:]
+            print("Loading psi from persisted file")
+        psi = persisted_psi[psi_name][:]
     else:
         if verbose:
-            print("creating psi and persisting it to a file")
-        J, Q = 8, 3
-        psi = compute_PSI('./SoundDatabase', J, Q, 5, 432, verbose = verbose) 
-        persisted_psi.create_dataset('psi_1', data=psi)
+            print("Creating psi and persisting it to a file")
+        psi = compute_PSI(root, J, Q, 5, 432, verbose = verbose) 
+        persisted_psi.create_dataset(psi_name, data=psi)
 
     persisted_psi.close()
 
@@ -178,7 +181,9 @@ def similarity_all(psi):
 
     return similarities
 
-def compute_average_similaritiy(samples, root, psi = getpsi(verbose = False)):
+def compute_average_similaritiy(samples, root, J = 8, Q = 3):
+
+    psi = getpsi(verbose = False, J = 8, Q = 3)
 
     nbSamples = len(samples)
 

@@ -127,9 +127,9 @@ def scatter_over_pertinence(q, root, samples=[], exagerated = False):
 
 # TRACÉ DE LA MATRICE DES SIMILARITÉS
 
-def displaySimilarities(samples = [], root = './SoundDatabase'):
+def displaySimilarities(samples = [], root = './SoundDatabase', J = 8, Q = 3):
 
-    psi = getpsi(verbose = False)
+    psi = getpsi(verbose = False, J = J, Q = Q)
     similarities = similarity_all(psi)
 
     nbSounds = similarities.shape[0]
@@ -170,7 +170,7 @@ def scatter_over_similarity(root, samples=[]):
 
 # AFFICHAGES D'INFORMATIONS SUR UN ECHANTILLONAGES
 
-def present_sampling(sampling_function, nbSamples, exagerated_pertinences = False):
+def present_sampling(sampling_function, nbSamples, exagerated_pertinences = False, J = 8, Q = 3):
 
     # Initialisation et calculs
     root = './SoundDatabase'
@@ -187,7 +187,7 @@ def present_sampling(sampling_function, nbSamples, exagerated_pertinences = Fals
     print("Average pertinence:", np.mean(pertinences['pertinence']))
     print()
 
-    print("Average similarity:", compute_average_similaritiy(samples, root))
+    print("Average similarity:", compute_average_similaritiy(samples, root, J = J, Q = Q))
     print()
 
     # Affichages sur figure polaire
@@ -197,7 +197,7 @@ def present_sampling(sampling_function, nbSamples, exagerated_pertinences = Fals
     displayPertinences(exagerated_pertinences, samples)
 
     # Affichage sur figure similarités
-    displaySimilarities(samples)
+    displaySimilarities(samples, J = J, Q = Q)
 
     # Extraction des oiseaux 
     birds_set = extract_birds(samples,'./BirdNET')
@@ -207,10 +207,10 @@ def present_sampling(sampling_function, nbSamples, exagerated_pertinences = Fals
 
 # COMPARAISON D'ÉCHANTILLONAGES
 
-def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, color_list, root = './SoundDatabase', clouds_alpha = 0.3, pareto = True, bestOfN_step = 20):
+def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, color_list, root = './SoundDatabase', J = 8, Q = 3, clouds_alpha = 0.3, pareto = True, bestOfN_step = 20):
 
     # Calculs des échantillonages
-    average_pertinences, average_similarities, average_birds, criteria = compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = root)
+    average_pertinences, average_similarities, average_birds, criteria = compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = root, J = J, Q = Q)
 
     # Affichages des valeurs moyennes
     displaySamplingsAverages(sampling_names, average_pertinences, average_similarities, average_birds)
@@ -227,7 +227,7 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, colo
 
 # CALCUL DES ECHANTILLONNAGES POUR UNE LISTE D'ECHANTILLONNEURS
 
-def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase', persist_samples = False, normalized = True):
+def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = './SoundDatabase', J = 8, Q = 3, persist_samples = False, normalized = True):
 
     # Initialisation
     average_pertinences = np.array(np.zeros(nbSamplings), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
@@ -241,9 +241,9 @@ def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, roo
         min_pertinence = np.min(q['pertinence'])
         max_pertinence = np.max(q['pertinence'])
 
-        s = similarity_all(getpsi(verbose = False))
-        min_similarity = np.min(s)
-        max_similarity = np.max(s - 10 * np.eye(s.shape[0]))
+        # s = similarity_all(getpsi(verbose = False, J = J, Q = Q))
+        # min_similarity = np.min(s)
+        # max_similarity = np.max(s - 10 * np.eye(s.shape[0]))
 
     # Calculs
     for s in range(nbSamplings):
@@ -256,11 +256,11 @@ def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, roo
             sampling_name = sampling_names[k]
 
             average_pertinences[sampling_name][s] = np.mean(compute_sample_pertinence(samples, root)['pertinence'])
-            average_similarities[sampling_name][s] = compute_average_similaritiy(samples, root)
+            average_similarities[sampling_name][s] = compute_average_similaritiy(samples, root, J = J, Q = Q)
 
             if (normalized):
                 average_pertinences[sampling_name][s] = (average_pertinences[sampling_name][s] - min_pertinence) / (max_pertinence - min_pertinence)
-                average_similarities[sampling_name][s] = (average_similarities[sampling_name][s] - min_similarity) / (max_similarity - min_similarity)
+                # average_similarities[sampling_name][s] = (average_similarities[sampling_name][s] - min_similarity) / (max_similarity - min_similarity)
 
             average_birds[sampling_name][s] = len(extract_birds(samples,'./BirdNET'))
             criteria[sampling_name][s] = criterium

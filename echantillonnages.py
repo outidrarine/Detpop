@@ -46,9 +46,9 @@ def sampling_random(nbSamples, nbSounds = 432, root = './SoundDatabase'):
 
 # Echantillonage par K-Means
 
-def sampling_kmeans(nbSamples, root = './SoundDatabase'):
+def sampling_kmeans(nbSamples, root = './SoundDatabase', J = 8, Q = 3):
 
-    psi = getpsi(verbose = False)
+    psi = getpsi(verbose = False, J = J, Q = Q)
 
     kmeans = KMeans(n_clusters = nbSamples).fit(psi)
 
@@ -63,9 +63,9 @@ def sampling_kmeans(nbSamples, root = './SoundDatabase'):
 
 # Echantillonage par DPP
 
-def sampling_dpp(nbSamples, root = './SoundDatabase'):
+def sampling_dpp(nbSamples, root = './SoundDatabase', J = 8, Q = 3):
 
-    psi = getpsi(verbose = False)
+    psi = getpsi(verbose = False, J = J, Q = Q)
 
     DPP = FiniteDPP('likelihood', **{'L': psi.dot(psi.T)})
 
