@@ -11,8 +11,7 @@ import csv
 
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
-from constructionPsi import compute_all_pertinence, compute_sample_pertinence, compute_average_similaritiy, get_all_pertinence, similarity_all, getpsi
-from echantillonnages import compute_criteria
+from constructionPsi import compute_sample_pertinence, compute_average_similaritiy, get_all_pertinence, similarity_all, getpsi
 
 # SPECTROGRAMME
 
@@ -175,7 +174,7 @@ def present_sampling(sampling_function, nbSamples, exagerated_pertinences = Fals
 
     # Initialisation et calculs
     root = './SoundDatabase'
-    samples = sampling_function(nbSamples)
+    samples, _ = sampling_function(nbSamples)
 
     pertinences = compute_sample_pertinence(samples, root)
 
@@ -253,7 +252,7 @@ def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, roo
 
         for k, sampling in enumerate(sampling_list):
             
-            samples = sampling(nbSamples)
+            samples, criterium = sampling(nbSamples)
             sampling_name = sampling_names[k]
 
             average_pertinences[sampling_name][s] = np.mean(compute_sample_pertinence(samples, root)['pertinence'])
@@ -264,8 +263,8 @@ def compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, roo
                 average_similarities[sampling_name][s] = (average_similarities[sampling_name][s] - min_similarity) / (max_similarity - min_similarity)
 
             average_birds[sampling_name][s] = len(extract_birds(samples,'./BirdNET'))
-            criteria[sampling_name][s] = compute_criteria(sampling_name, samples, average_pertinences[sampling_name][s], average_similarities[sampling_name][s])
-            
+            criteria[sampling_name][s] = criterium
+
             # writing data to text file
             if(persist_samples):
                 exportSamplesToFiles(sampling_name, samples, s)

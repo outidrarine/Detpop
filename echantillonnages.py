@@ -5,7 +5,7 @@ from dppy.finite_dpps import FiniteDPP
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 
-from constructionPsi import compute_sample_pertinence, get_all_pertinence, getpsi
+from constructionPsi import get_all_pertinence, getpsi
 from utils import getFilenamesAtPositions, getPositionsOfFilenames
 
 # Echantillonage par pertinence
@@ -19,6 +19,8 @@ def sampling_pertinence(nbSamples, takeMax = False, root = './SoundDatabase'):
         q.sort(order = 'pertinence')
         samples = q['file'][-nbSamples:]
 
+        criteria = np.mean(q['pertinence'][-nbSamples:])
+
     else:
 
         nbSounds = len(q['file'])
@@ -26,7 +28,9 @@ def sampling_pertinence(nbSamples, takeMax = False, root = './SoundDatabase'):
         samplesPositions = np.random.choice(np.arange(0, nbSounds), p = q['pertinence'] / np.sum(q['pertinence']), size = nbSamples)
         samples = getFilenamesAtPositions(root, samplesPositions)
 
-    return samples
+        criteria = np.mean(q['pertinence'][samplesPositions])
+
+    return samples, criteria
 
 
 # Echantillonage aleatoire
@@ -37,7 +41,7 @@ def sampling_random(nbSamples, nbSounds = 432, root = './SoundDatabase'):
 
     samples = getFilenamesAtPositions(root, samples_positions)
 
-    return samples
+    return samples, 0
 
 
 # Echantillonage par K-Means
@@ -52,7 +56,9 @@ def sampling_kmeans(nbSamples, root = './SoundDatabase'):
 
     samples = getFilenamesAtPositions(root, samples_positions)
 
-    return samples
+    criteria = kmeans.score(psi)
+
+    return samples, criteria
 
 
 # Echantillonage par DPP
@@ -67,29 +73,6 @@ def sampling_dpp(nbSamples, root = './SoundDatabase'):
 
     samples = getFilenamesAtPositions(root, samples_positions)
 
-    return np.array(samples)
+    det = np.linalg.det(psi[samples_positions].dot(psi[samples_positions].T))
 
-
-# Calcul du critère (change selon le type d'échantillonneur) pour un échantillonnage
-
-def compute_criteria(sampling_name, samples, average_pertinence, average_similarity, root = './SoundDatabase', ):
-
-    if (sampling_name == 'Random'):
-        return average_pertinence * average_similarity
-
-    elif (sampling_name == 'Pertinence'):
-        return average_pertinence
-
-    elif (sampling_name == 'K-means'):
-        return 0
-
-    elif (sampling_name == 'DPP'):
-
-        psi = getpsi(verbose = False)
-        positions = getPositionsOfFilenames(root, samples)
-        psi_samples = np.matmul(psi[positions], psi[positions].T)
-
-        return np.linalg.det(psi_samples)
-
-    else:
-        return 0
+    return np.array(samples), det
