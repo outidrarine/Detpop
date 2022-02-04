@@ -162,42 +162,54 @@ def getpsi(J = 8, Q = 3, verbose = True, root = './SoundDatabase'):
     return psi
 
 
-# Similarités
+# Diversité
 
-def similarity(position1, position2, psi):
-    sound1 = psi[position1]
-    sound2 = psi[position2]
-    cos = np.dot(sound1, sound2) / (np.linalg.norm(sound1) * np.linalg.norm(sound2))
-    return cos
+def compute_diversity(samples, root, J = 8, Q = 3, withPositions = False):
+
+    psi = getpsi(verbose = False, J = J, Q = Q)
+
+    if not(withPositions):
+        positions = getPositionsOfFilenames(root, samples)
+    else:
+        positions = samples
+
+    psi_samples = np.array([psi[position] / np.linalg.norm(psi[position]) for position in positions])
+    s = abs(np.linalg.det(psi_samples.dot(psi_samples.T)))
+
+    return s
 
 
-def similarity_all(psi):
-    nbSounds = psi.shape[0]
-    similarities = np.zeros((nbSounds, nbSounds))
+def diversity_all(root = './SoundDatabase', J = 8, Q = 3, nbSounds = 432):
+
+    diversities = np.zeros((nbSounds, nbSounds))
 
     for j in range(nbSounds):
         for i in range(nbSounds):
-            similarities[i, j] = similarity(i, j, psi)
+            diversities[i, j] = compute_diversity([i, j], root, J = J, Q = Q, withPositions = True)
 
-    return similarities
+    return diversities
 
-def compute_average_similaritiy(samples, root, J = 8, Q = 3):
 
-    psi = getpsi(verbose = False, J = 8, Q = 3)
+def get_all_diversity(root = './SoundDatabase', J = 8, Q = 3, nbSounds = 432, verbose = True):
 
-    nbSamples = len(samples)
+    persisted_diversities = h5py.File("./persisted_data/diversities.hdf5", "a")
 
-    positions = getPositionsOfFilenames(root, samples)
+    diversities_name = "diversities_{}_{}".format(J, Q)
 
-    avg_similarity = 0
-    k = 0
-    for j in range(0, nbSamples):
-        for i in range(0, j):
-            avg_similarity += similarity(positions[i], positions[j], psi)
-            k += 1
-    
-    avg_similarity /= nbSamples * (nbSamples - 1) / 2
+    if diversities_name in persisted_diversities:
+        if verbose:
+            print("Loading diversities from persisted file")
+        diversities = persisted_diversities[diversities_name][:]
+    else:
+        if verbose:
+            print("Creating diversities and persisting it to a file")
+        diversities = diversity_all(root = root, J = J, Q = Q, nbSounds = nbSounds) 
+        persisted_diversities.create_dataset(diversities_name, data = diversities)
 
-    return avg_similarity
+    persisted_diversities.close()
+
+    return diversities
+
+
 
 

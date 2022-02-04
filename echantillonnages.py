@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 
 from constructionPsi import get_all_pertinence, getpsi
-from utils import getFilenamesAtPositions, getPositionsOfFilenames
+from utils import getFilenamesAtPositions
 
 # Echantillonage par pertinence
 
