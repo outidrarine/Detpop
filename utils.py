@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 import os
 import numpy as np
 from scipy.io import wavfile
@@ -106,7 +107,7 @@ def getAllDates(root, with_year = True):
 
 
 # Extract set of birds from samples
-def extract_birds(samples, root):
+def extract_birds(samples, root, bird_search_mode = 'single', bird_confidence_limit = 0.1):
     for root, dirnames, filenames in os.walk(root):
         birds_file_name = np.array(filenames)
         clip_name = [filename.split('.')[0]+'.wav' for filename in np.array(filenames)]
@@ -115,5 +116,17 @@ def extract_birds(samples, root):
         set_of_birds = set()
         for index_of_bird_file in indexes_of_birds_files:
             data = pd.read_csv('./BirdNET/'+birds_file_name[index_of_bird_file], sep="\t",usecols = col_list)
-            set_of_birds = set_of_birds.union(set(data['Species Code']))
+            data = data.sort_values(by='Confidence', ascending=False)
+            new_birds_array = data[['Species Code','Confidence']]
+            if len(new_birds_array) > 0:
+                if(bird_search_mode == 'single'):
+                    new_birds_array = new_birds_array['Species Code']
+                    new_birds_array = {new_birds_array[0]}
+                elif(bird_search_mode == 'multi'):
+                    new_birds_array = new_birds_array[new_birds_array['Confidence'] > bird_confidence_limit]
+                    new_birds_array = new_birds_array['Species Code']
+                else:
+                    raise ValueError('mode can only be "single" or "multi"')
+                set_of_birds = set_of_birds.union(set(new_birds_array))
+            
         return set_of_birds

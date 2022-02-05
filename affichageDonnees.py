@@ -169,7 +169,7 @@ def scatter_over_diversity(root, samples=[]):
 
 # AFFICHAGES D'INFORMATIONS SUR UN ECHANTILLONAGES
 
-def present_sampling(sampling_function, nbSamples, exagerated_pertinences = False, J = 8, Q = 3):
+def present_sampling(sampling_function, nbSamples, exagerated_pertinences = False, J = 8, Q = 3, bird_search_mode = 'single', bird_confidence_limit = 0.1):
 
     # Initialisation et calculs
     root = './SoundDatabase'
@@ -199,7 +199,7 @@ def present_sampling(sampling_function, nbSamples, exagerated_pertinences = Fals
     displayDiversities(samples, J = J, Q = Q)
 
     # Extraction des oiseaux 
-    birds_set = extract_birds(samples,'./BirdNET')
+    birds_set = extract_birds(samples, './BirdNET', bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)
     print('Extraction of birds from those samples :',len(birds_set))
     print(birds_set)
 
