@@ -8,6 +8,8 @@ from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
 import os
 import csv
+import h5py
+
 
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
@@ -203,13 +205,31 @@ def present_sampling(sampling_function, nbSamples, exagerated_pertinences = Fals
     print('Extraction of birds from those samples :',len(birds_set))
     print(birds_set)
 
+# Echantinnage 
+def get_all_samples(sampling_list, sampling_names, nbSamples, nbSamplings, root, J, Q):
+
+    persisted_all_samples = h5py.File("./persisted_data/all_samples.hdf5", "a")
+    if 'average_pertinences' and 'diversities' and 'average_birds' and 'criteria' in persisted_all_samples:
+        print("Loading samples from persisted file")
+        average_pertinences = persisted_all_samples['average_pertinences'][:]
+        diversities = persisted_all_samples['diversities'][:]
+        average_birds = persisted_all_samples['average_birds'][:]
+        criteria = persisted_all_samples['criteria'][:]
+    else:
+        print("Creating samples and persisting them to a file")
+        average_pertinences, diversities, average_birds, criteria = compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = root, J = J, Q = Q)
+        persisted_all_samples.create_dataset('average_pertinences', data = average_pertinences)
+        persisted_all_samples.create_dataset('diversities', data = diversities)
+        persisted_all_samples.create_dataset('average_birds', data = average_birds)
+        persisted_all_samples.create_dataset('criteria', data = criteria)
+    return average_pertinences, diversities, average_birds, criteria
 
 # COMPARAISON D'ÉCHANTILLONAGES
 
 def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, color_list, root = './SoundDatabase', J = 8, Q = 3, clouds_alpha = 0.3, pareto = True, bestOfN_step = 20):
 
     # Calculs des échantillonages
-    average_pertinences, diversities, average_birds, criteria = compute_samplings(sampling_list, sampling_names, nbSamples, nbSamplings, root = root, J = J, Q = Q)
+    average_pertinences, diversities, average_birds, criteria = get_all_samples(sampling_list, sampling_names, nbSamples, nbSamplings, root = root, J = J, Q = Q)
 
     # Affichages des valeurs moyennes
     displaySamplingsAverages(sampling_names, average_pertinences, diversities, average_birds)
@@ -222,6 +242,9 @@ def compare_sampling(sampling_list, sampling_names, nbSamples, nbSamplings, colo
 
     # Affichage des best of N
     displayBestOfN(sampling_names, average_pertinences, diversities, criteria, bestOfN_step, nbSamplings, color_list)
+
+    # Affichage de l'oracle
+    print(average_birds['Random'])
 
 
 # CALCUL DES ECHANTILLONNAGES POUR UNE LISTE D'ECHANTILLONNEURS
