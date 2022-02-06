@@ -6,30 +6,29 @@ from dppy.finite_dpps import FiniteDPP
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 
-from constructionPsi import get_all_pertinence, getpsi, compute_sample_pertinence, compute_diversity
+from constructionPsi import getPertinences, getpsi, compute_sample_pertinence, compute_diversity
 from utils import getFilenamesAtPositions, extract_birds, progressbar
 
 
 # Echantillonage par pertinence
 
-def sampling_pertinence(nbSamples, root = './SoundDatabase', J = 8, Q = 3):
+def sampling_pertinence(nbSamples, root = './SoundDatabase', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
-    q = get_all_pertinence(verbose = False)
-    q.sort(order = 'file')
+    q = getPertinences(verbose = False, pertinenceFunction = pertinenceFunction, root = root)
 
-    nbSounds = len(q['file'])
+    nbSounds = len(q)
     
-    samplesPositions = np.random.choice(np.arange(0, nbSounds), p = q['pertinence'] / np.sum(q['pertinence']), size = nbSamples)
+    samplesPositions = np.random.choice(np.arange(0, nbSounds), p = q / np.sum(q), size = nbSamples)
     samples = getFilenamesAtPositions(root, samplesPositions)
 
-    criterion = np.mean(q['pertinence'][samplesPositions])
+    criterion = np.mean(q[samplesPositions])
 
     return samples, criterion
 
 
 # Echantillonage aleatoire
 
-def sampling_random(nbSamples, root = './SoundDatabase', J = 8, Q = 3):
+def sampling_random(nbSamples, root = './SoundDatabase', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
     nbSounds = 432
 
@@ -42,9 +41,9 @@ def sampling_random(nbSamples, root = './SoundDatabase', J = 8, Q = 3):
 
 # Echantillonage par K-Means
 
-def sampling_kmeans(nbSamples, root = './SoundDatabase', J = 8, Q = 3):
+def sampling_kmeans(nbSamples, root = './SoundDatabase', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
-    psi = getpsi(verbose = False, J = J, Q = Q)
+    psi = getpsi(verbose = False, J = J, Q = Q, pertinenceFunction = pertinenceFunction)
 
     kmeans = KMeans(n_clusters = nbSamples).fit(psi)
 
@@ -59,9 +58,9 @@ def sampling_kmeans(nbSamples, root = './SoundDatabase', J = 8, Q = 3):
 
 # Echantillonage par DPP
 
-def sampling_dpp(nbSamples, root = './SoundDatabase', J = 8, Q = 3):
+def sampling_dpp(nbSamples, root = './SoundDatabase', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
-    psi = getpsi(verbose = False, J = J, Q = Q)
+    psi = getpsi(verbose = False, J = J, Q = Q, pertinenceFunction = pertinenceFunction)
 
     DPP = FiniteDPP('likelihood', **{'L': psi.dot(psi.T)})
 
@@ -81,9 +80,9 @@ def computeSampling(samplingName, nbSamples, J, Q, pertinenceFunction, birdSearc
     samplings = {'Random': sampling_random, 'Pertinence': sampling_pertinence, 'K-means': sampling_kmeans, 'K-DPP': sampling_dpp}
     sampling = samplings[samplingName]
 
-    samples, criterion = sampling(nbSamples, root = root, J = J, Q = Q)
+    samples, criterion = sampling(nbSamples, root = root, J = J, Q = Q, pertinenceFunction = pertinenceFunction)
 
-    averagePertinences = np.mean(compute_sample_pertinence(samples, root)['pertinence'])
+    averagePertinences = np.mean(compute_sample_pertinence(samples, root = root, pertinenceFunction = pertinenceFunction))
     diversity = compute_diversity(samples, root, J = J, Q = Q)
 
     nbBirds = len(extract_birds(samples,'./BirdNET'))

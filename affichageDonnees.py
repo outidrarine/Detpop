@@ -1,18 +1,16 @@
 # LIBRAIRIES
 
 import numpy as np
+import os
+import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib import patches
 from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
-import os
-import csv
-import pandas as pd
-
 
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
-from constructionPsi import compute_sample_pertinence, compute_diversity, get_all_pertinence, get_all_diversity
+from constructionPsi import compute_sample_pertinence, compute_diversity, getPertinences, get_all_diversity
 from echantillonnages import getSamplings
 
 # SPECTROGRAMME
@@ -83,10 +81,9 @@ def displayPolarSamples(samples):
 
 # TRACÉ DE LA PERTINENCE
 
-def displayPertinences(exagerated = False, samples = [], root = './SoundDatabase'):
+def displayPertinences(pertinenceFunction = 'identity', samples = [], root = './SoundDatabase'):
 
-    q = get_all_pertinence(verbose = False)
-    q.sort(order = 'file')
+    q = getPertinences(verbose = False, pertinenceFunction = pertinenceFunction)
 
     nbSounds = len(q)
 
@@ -94,14 +91,9 @@ def displayPertinences(exagerated = False, samples = [], root = './SoundDatabase
 
     plt.figure(figsize = (15, 7))
 
-    if exagerated:
-        plt.plot(1/(1 - q['pertinence']))
-        mean_pertinence = np.mean(1 / (1 - q['pertinence']))
-        max_pertinence = np.max(1 / (1 - q['pertinence']))
-    else:
-        plt.plot(q['pertinence'])
-        mean_pertinence = np.mean(q['pertinence'])
-        max_pertinence = np.max(q['pertinence'])
+    plt.plot(q)
+    mean_pertinence = np.mean(q)
+    max_pertinence = np.max(q)
     
     dates = ['midnight', 'noon', 'midnight', 'noon', 'midnight', 'noon', 'midnight']
     plt.xticks([nbSounds/6 * k for k in range(7)], dates)
@@ -112,19 +104,15 @@ def displayPertinences(exagerated = False, samples = [], root = './SoundDatabase
 
     # Affichages de points sur la courbe
 
-    scatter_over_pertinence(q, root, samples, exagerated)
+    scatter_over_pertinence(q, root, samples)
 
 
 # INDIQUE LES ÉCHANTILLONS SELECTIONNÉS PAR UN ÉCHANTILLONAGE DANS LA COURBE DES PERTINENCES
 
-def scatter_over_pertinence(q, root, samples=[], exagerated = False):
+def scatter_over_pertinence(q, root, samples=[]):
 
     places = getPositionsOfFilenames(root, samples)
-
-    if exagerated:
-        plt.scatter(places, 1 / (1 - q['pertinence'][places]), 50, marker='x', color = 'r')
-    else:
-        plt.scatter(places, q['pertinence'][places], 50, marker='x', color = 'r')
+    plt.scatter(places, q[places], 50, marker='x', color = 'r')
 
 
 # TRACÉ DE LA MATRICE DES DIVERSITES
@@ -171,21 +159,21 @@ def scatter_over_diversity(root, samples=[]):
 
 # AFFICHAGES D'INFORMATIONS SUR UN ECHANTILLONAGE
 
-def present_sampling(sampling_function, nbSamples, exagerated_pertinences = False, J = 8, Q = 3, bird_search_mode = 'single', bird_confidence_limit = 0.1):
+def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identity', J = 8, Q = 3, bird_search_mode = 'single', bird_confidence_limit = 0.1):
 
     # Initialisation et calculs
     root = './SoundDatabase'
     samples, _ = sampling_function(nbSamples)
 
-    pertinences = compute_sample_pertinence(samples, root)
+    pertinences = compute_sample_pertinence(samples, root = root, pertinenceFunction = pertinenceFunction)
 
     # Affichage des textes
     print()
     print("Samples:", samples)
     print()
 
-    print("Pertinences list:", pertinences['pertinence'])
-    print("Average pertinence:", np.mean(pertinences['pertinence']))
+    print("Pertinences list:", pertinences)
+    print("Average pertinence:", np.mean(pertinences))
     print()
 
     print("diversity:", compute_diversity(samples, root, J = J, Q = Q))
@@ -195,7 +183,7 @@ def present_sampling(sampling_function, nbSamples, exagerated_pertinences = Fals
     displayPolarSamples(samples)
 
     # Affichage sur figure pertinences
-    displayPertinences(exagerated_pertinences, samples)
+    displayPertinences(pertinenceFunction = pertinenceFunction, samples = samples, root = root)
 
     # Affichage sur figure diversités
     displayDiversities(samples, J = J, Q = Q)
@@ -216,6 +204,22 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
     # Affichages des valeurs moyennes
     displaySamplingsAverages(samplingNames, average_pertinences, diversities, average_birds)
 
+    # Remise des pertinences et diversités entre 0 et 1
+    qmin, qmax, dmin, dmax = float('inf'), 0, float('inf'), 0
+    for samplingName in samplingNames:
+        if np.min(average_pertinences[samplingName]) < qmin:
+            qmin = np.min(average_pertinences[samplingName])
+        if np.max(average_pertinences[samplingName]) > qmax:
+            qmax = np.max(average_pertinences[samplingName])
+        if np.min(diversities[samplingName]) < dmin:
+            dmin = np.min(diversities[samplingName])
+        if np.max(diversities[samplingName]) > dmax:
+            dmax = np.max(diversities[samplingName])
+
+    for samplingName in samplingNames:
+        average_pertinences[samplingName] = (average_pertinences[samplingName] - qmin) / (qmax - qmin)
+        diversities[samplingName] = (diversities[samplingName] - dmin) / (dmax - dmin)
+
     # Affichages des histogrammes
     displaySamplingsHistograms(samplingNames, average_pertinences, diversities)
 
@@ -231,7 +235,7 @@ def displayOracleGraph(sampling_list, sampling_names, nbSamples_max, bird_search
     for k, sampling in enumerate(sampling_list):
         sampling_name = sampling_names[k]
         for i in range(3, nbSamples_max + 1):
-            samples, criterium = sampling(i)
+            samples, criterion = sampling(i)
             average_birds[sampling_name][i] = len(extract_birds(samples,root, bird_search_mode, bird_confidence_limit))
     
     total_number_of_birds = len(get_all_birds(root))
@@ -291,7 +295,7 @@ def displaySamplingsAverages(samplingNames, average_pertinences, diversities, av
 # AFFICHAGES DES HISTOGRAMMES DES ECHANTILLONNAGES
 
 def displaySamplingsHistograms(samplingNames, average_pertinences, diversities):
-    
+
     cols_names = ['Pertinence', 'Diversity']
     rows_names = samplingNames
 
@@ -425,16 +429,3 @@ def computeBestOfN(samplingNames, average_pertinences, average_diversities, crit
             bestOfN[sampling_name][:, k] = x, y
     
     return bestOfN
-
-
-# ENREGISTREMENT DES ÉCHANTILLONAGES DANS DES FICHIERS CSV
-
-def exportSamplesToFiles(sampling_name, samples, s):
-    path = "./Results/" + sampling_name + "/"
-    isExist = os.path.exists(path)
-    if not isExist:
-        os.makedirs(path)
-    f = open(path + str(s) + ".txt","w+") # creating 1.txt, 2.txt etc...
-    write = csv.writer(f)
-    write.writerow(samples)
-    f.close()

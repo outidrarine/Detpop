@@ -8,10 +8,18 @@ from maad.sound import spectrogram
 import os
 import h5py
 
-from utils import getPositionsOfFilenames, getSound
+from utils import getPositionsOfFilenames, getSound, progressbar
 
 
 # Pertinence
+
+def applyPertinenceFunction(q, pertinenceFunction = 'identity'):
+
+    if pertinenceFunction == 'identity':
+        return q
+    elif pertinenceFunction == 'inverse':
+        return 1 / (1 - q)
+
 
 def compute_pertinence(sound, fe):
     Spec, tn, fn, _ = spectrogram(sound, fe)
@@ -19,75 +27,52 @@ def compute_pertinence(sound, fe):
     return q
 
 
-def compute_all_pertinence(root, duration = 5, nbSounds = 432, dtype = None):
-    
-    if dtype is None:
-        dtype = np.dtype([('file', str, 29), ('pertinence', np.float64)])
+def compute_all_pertinence(root, duration = 5, nbSounds = 432):
 
-    q = np.zeros((nbSounds), dtype = dtype)
+    q = np.zeros(nbSounds)
 
-    k = 0
-    for root, dirnames, filenames in os.walk(root):
-        for f in filenames:
+    for _, _, filenames in os.walk(root):
+        for k, f in enumerate(filenames):
             filename = os.path.join(root, f)
             sound, fe = getSound(filename, duration)
-            q[k] = f, compute_pertinence(sound, fe)
-            k += 1
+            q[k] = compute_pertinence(sound, fe)
 
     return q
 
 
-def compute_sample_pertinence(samples, root, duration = 5):
+def compute_sample_pertinence(samples, root = './SoundDatabase', pertinenceFunction = 'identity'):
 
-    nbSamples = len(samples)
+    q = getPertinences(pertinenceFunction = pertinenceFunction, root = root, verbose = False)
+    samplesPositions = getPositionsOfFilenames(root, samples)
 
-    dt = np.dtype([('file', np.unicode_, 64), ('pertinence', np.float64)])
-
-    q = np.zeros((nbSamples), dtype = dt)
-
-    k = 0
-    for f in samples:
-        filename = os.path.join(root, f)
-        sound, fe = getSound(filename, duration)
-        q[k] = f, compute_pertinence(sound, fe)
-        k += 1
-
-    return q
+    return q[samplesPositions]
 
 
-def get_all_pertinence(verbose = True):
+def getPertinences(pertinenceFunction = 'identity', root = './SoundDatabase', verbose = True):
 
-    persisted_all_pertinence = h5py.File("./persisted_data/pertinence.hdf5", "a")
+    persisted_pertinences = h5py.File("./persisted_data/pertinences.hdf5", "a")
 
-    if 'all_pertinence' in persisted_all_pertinence:
+    pertinences_name = "pertinences"
+
+    if pertinences_name in persisted_pertinences:
         if verbose:
-            print("loading pertinences from persisted file")
-        q = persisted_all_pertinence['all_pertinence'][:]
+            print("Loading pertinences from persisted file")
 
-        dtype = np.dtype([('file', str, 29), ('pertinence', np.float64)])
-        q_bis = np.zeros(q.size, dtype = dtype)
-
-        q_bis['file'] = np.array([filename.decode("utf-8") for filename in q['file']])
-        q_bis['pertinence'] = q['pertinence']
+        pertinences = persisted_pertinences[pertinences_name][:]
 
     else:
         if verbose:
-            print("creating pertinences and persisting it to a file")
+            print("Creating pertinences matrix and persisting it to a file")
 
-        dt = ([('file', h5py.string_dtype('utf-8', 29)), ('pertinence', float)])
-        q = compute_all_pertinence('./SoundDatabase', dtype = dt)
+        pertinences = compute_all_pertinence(root = root)
+        
+        persisted_pertinences.create_dataset(pertinences_name, data = pertinences)
 
-        persisted_all_pertinence.create_dataset('all_pertinence', data = q, dtype = dt)
+    persisted_pertinences.close()
 
-        dtype = np.dtype([('file', str, 29), ('pertinence', np.float64)])
-        q_bis = np.zeros(q.size, dtype = dtype)
+    pertinences = applyPertinenceFunction(pertinences, pertinenceFunction = pertinenceFunction)
 
-        q_bis['file'] = np.array([filename.decode("utf-8") for filename in q['file']])
-        q_bis['pertinence'] = q['pertinence']
-
-    persisted_all_pertinence.close()
-
-    return q_bis
+    return pertinences
 
 
 # Descripteur
@@ -103,61 +88,64 @@ def compute_descriptor(sound, J, Q):
     order2 = np.where(scattering.meta()['order'] == 2)
 
     descriptor = scalogram[order2]
-    descriptor = np.mean(descriptor, axis=1)
+    descriptor = np.mean(descriptor, axis = 1)
     descriptor = descriptor / np.linalg.norm(descriptor)
 
     return descriptor
 
 
-# Psi
+def compute_descriptors(root, J, Q, duration, nbSounds, verbose = True):
+    
+    descriptors = [0] * nbSounds
+    
+    for root, _, filenames in os.walk(root):
+        for k, f in enumerate(filenames):
 
-def compute_PSI(root, J, Q, duration, nbSounds, verbose = True):
-    
-    psi = [0] * nbSounds
-    
-    k = 0
-    progress = -1
-    for root, dirnames, filenames in os.walk(root):
-        for f in filenames:
-            
-            if k >= nbSounds:
-                break
-                
-            percentage = round(k/nbSounds * 100)
-            if (percentage % 10) == 0 and percentage > progress and verbose:
-                progress = percentage
-                print(percentage, "%")
+            if verbose:
+                progressbar(nbSounds, k)
                 
             filename = os.path.join(root, f)
             
-            sound, fe = getSound(filename, duration)
-            q = compute_pertinence(sound, fe)
-            d = compute_descriptor(sound, J, Q)
-            psi[k] = np.sqrt(q)*d
-            k += 1
-    if verbose:    
-        print("DONE")
+            sound, _ = getSound(filename, duration)
+            descriptors[k] = compute_descriptor(sound, J, Q)
     
-    return np.array(psi)
+    if verbose:
+        print()
+    
+    return np.array(descriptors)
 
 
-def getpsi(J = 8, Q = 3, verbose = True, root = './SoundDatabase'):
+def getDesciptors(J = 8, Q = 3, root = './SoundDatabase', verbose = True):
 
-    persisted_psi = h5py.File("./persisted_data/psi.hdf5", "a")
+    persisted_descriptors = h5py.File("./persisted_data/descriptors.hdf5", "a")
 
-    psi_name = "psi_{}_{}".format(J, Q)
+    descriptors_name = f"descriptors_{J}_{Q}"
 
-    if psi_name in persisted_psi:
+    if descriptors_name in persisted_descriptors:
         if verbose:
-            print("Loading psi from persisted file")
-        psi = persisted_psi[psi_name][:]
+            print("Loading descriptors from persisted file")
+        descriptors = persisted_descriptors[descriptors_name][:]
     else:
         if verbose:
-            print("Creating psi and persisting it to a file")
-        psi = compute_PSI(root, J, Q, 5, 432, verbose = verbose) 
-        persisted_psi.create_dataset(psi_name, data=psi)
+            print("Creating descriptors matrix and persisting it to a file")
 
-    persisted_psi.close()
+        descriptors = compute_descriptors(root, J, Q, 5, 432, verbose = verbose) 
+        persisted_descriptors.create_dataset(descriptors_name, data = descriptors)
+
+    persisted_descriptors.close()
+
+    return descriptors
+
+
+# Psi
+
+def getpsi(J = 8, Q = 3, verbose = True, root = './SoundDatabase', pertinenceFunction = 'identity'):
+
+    descriptors = getDesciptors(J = J, Q = Q, root = root, verbose = verbose)
+    pertinences = getPertinences(root = root, pertinenceFunction = pertinenceFunction, verbose = verbose)
+    
+    pertinences = np.tile(pertinences, (descriptors.shape[1], 1)).T
+    psi = np.multiply(descriptors, pertinences)
 
     return psi
 
