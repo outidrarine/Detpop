@@ -1,5 +1,6 @@
 from logging import raiseExceptions
 import os
+import sys
 import numpy as np
 from scipy.io import wavfile
 import pandas as pd
@@ -107,6 +108,7 @@ def getAllDates(root, with_year = True):
 
 
 # Extract set of birds from samples
+
 def extract_birds(samples, root, bird_search_mode = 'single', bird_confidence_limit = 0.1):
     for root, dirnames, filenames in os.walk(root):
         birds_file_name = np.array(filenames)
@@ -130,3 +132,11 @@ def extract_birds(samples, root, bird_search_mode = 'single', bird_confidence_li
                 set_of_birds = set_of_birds.union(set(new_birds_array))
             
         return set_of_birds
+
+
+# AFFICHAGE D'UNE BARRE DE PROGRESSION
+
+def progressbar(max_progress, progress):
+    sys.stdout.write('\r')
+    sys.stdout.write("[%-100s] %d%%" % ('='*round(progress / max_progress * 100), 100*progress/max_progress))
+    sys.stdout.flush()
