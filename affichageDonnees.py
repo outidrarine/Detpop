@@ -229,14 +229,20 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
     # Affichage des best of N
     displayBestOfN(samplingNames, average_pertinences, diversities, criteria, bestOfN_step, nbSamplings, color_list)
 
+
 # Affichage du graph oracle
-def displayOracleGraph(sampling_list, sampling_names, nbSamples_max, bird_search_mode, bird_confidence_limit, color_list, root, J, Q):
+
+def displayOracleGraph(sampling_list, sampling_names, nbSamples_max, nbSamplings, bird_search_mode, bird_confidence_limit, color_list, root, J, Q):
     average_birds = np.array(np.zeros(nbSamples_max + 1), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+    total_bird_iteration = np.zeros(nbSamplings)
     for k, sampling in enumerate(sampling_list):
         sampling_name = sampling_names[k]
         for i in range(3, nbSamples_max + 1):
-            samples, criterion = sampling(i)
-            average_birds[sampling_name][i] = len(extract_birds(samples,root, bird_search_mode, bird_confidence_limit))
+            for j in range(nbSamplings):
+                samples, criterion = sampling(i)
+                total_bird_iteration[j] = len(extract_birds(samples,root, bird_search_mode, bird_confidence_limit))
+
+            average_birds[sampling_name][i] = np.mean(total_bird_iteration)
     
     total_number_of_birds = len(get_all_birds(root))
     plt.figure(figsize=(10, 10))
