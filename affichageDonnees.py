@@ -7,6 +7,8 @@ from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
 import os
 import csv
+import pandas as pd
+
 
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
@@ -223,6 +225,51 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
     # Affichage des best of N
     displayBestOfN(samplingNames, average_pertinences, diversities, criteria, bestOfN_step, nbSamplings, color_list)
 
+# Affichage du graph oracle
+def displayOracleGraph(sampling_list, sampling_names, nbSamples_max, bird_search_mode, bird_confidence_limit, color_list, root, J, Q):
+    average_birds = np.array(np.zeros(nbSamples_max + 1), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+    for k, sampling in enumerate(sampling_list):
+        sampling_name = sampling_names[k]
+        for i in range(3, nbSamples_max + 1):
+            samples, criterium = sampling(i)
+            average_birds[sampling_name][i] = len(extract_birds(samples,root, bird_search_mode, bird_confidence_limit))
+    
+    total_number_of_birds = len(get_all_birds(root))
+    plt.figure(figsize=(10, 10))
+    for i, sampling_name in enumerate(sampling_names):
+
+        plt.plot(average_birds[sampling_name])
+
+        plt.xlim(3, nbSamples_max)
+
+        plt.xlabel("Number of Samples")
+        plt.ylabel("Number of birds")
+
+    endOfGraph = np.minimum(nbSamples_max, total_number_of_birds)
+    # Affchage de la courbe de l'oracle
+    plt.plot(np.linspace(3, nbSamples_max, nbSamples_max - 2), np.concatenate([np.linspace(3, endOfGraph, endOfGraph - 2) , [total_number_of_birds]*(np.maximum(0 , nbSamples_max - total_number_of_birds))]), color = 'r', linestyle = ':')
+
+
+    patch = []
+    for k, color in enumerate(color_list):
+        patch.append(patches.Patch(color = color, label = sampling_names[k]))
+    patch.append(patches.Patch(color = 'red', hatch = ':', linewidth = 2, fill = False, linestyle = ':', label = "Oracle"))
+    plt.legend(handles = patch)
+    plt.title("Oracle Graph")
+
+
+# Calcul de nombre total des birds 
+
+def get_all_birds(root):
+    col_list = ['Species Code']
+    set_of_birds = set()
+    
+    for root, dirnames, filenames in os.walk(root): 
+        for index_of_bird_file in filenames:
+            data = pd.read_csv('./BirdNET/'+index_of_bird_file, sep="\t",usecols = col_list)
+            new_birds_array = data['Species Code']
+            set_of_birds = set_of_birds.union(set(new_birds_array))
+    return set_of_birds
 
 # AFFICHAGE DES VALEURS MOYENNES DES ECHANTILLONNAGES
 
