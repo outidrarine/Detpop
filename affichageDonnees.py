@@ -232,32 +232,28 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
 
 # Affichage du graph oracle
 
-def displayOracleGraph(sampling_list, sampling_names, nbSamples_max, nbSamplings, bird_search_mode, bird_confidence_limit, color_list, root, J, Q):
-    average_birds = np.array(np.zeros(nbSamples_max + 1), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, color_list, root, J, Q):
+    average_birds = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
     total_bird_iteration = np.zeros(nbSamplings)
-    for k, sampling in enumerate(sampling_list):
-        sampling_name = sampling_names[k]
-        for i in range(3, nbSamples_max + 1):
-            for j in range(nbSamplings):
-                samples, criterion = sampling(i)
-                total_bird_iteration[j] = len(extract_birds(samples,root, bird_search_mode, bird_confidence_limit))
-
-            average_birds[sampling_name][i] = np.mean(total_bird_iteration)
+    for k, nbSamples in enumerate(nbSamplesList):
+        _, _, nbBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, J, Q, pertinenceFunction, bird_search_mode, verbose = True)
+        for sampling_name in sampling_names:
+            average_birds[sampling_name][k] = np.mean(nbBirdsArrays[sampling_name])
     
     total_number_of_birds = len(get_all_birds(root))
     plt.figure(figsize=(10, 10))
-    for i, sampling_name in enumerate(sampling_names):
+    for sampling_name in sampling_names:
 
-        plt.plot(average_birds[sampling_name])
+        plt.plot(nbSamplesList ,average_birds[sampling_name])
 
-        plt.xlim(3, nbSamples_max)
+        plt.xlim(nbSamplesList[0], nbSamplesList[-1])
 
         plt.xlabel("Number of Samples")
         plt.ylabel("Number of birds")
 
-    endOfGraph = np.minimum(nbSamples_max, total_number_of_birds)
+    endOfGraph = np.minimum(nbSamplesList[-1], total_number_of_birds)
     # Affchage de la courbe de l'oracle
-    plt.plot(np.linspace(3, nbSamples_max, nbSamples_max - 2), np.concatenate([np.linspace(3, endOfGraph, endOfGraph - 2) , [total_number_of_birds]*(np.maximum(0 , nbSamples_max - total_number_of_birds))]), color = 'r', linestyle = ':')
+    plt.plot(np.linspace(nbSamplesList[0], nbSamplesList[-1], nbSamplesList[-1] - nbSamplesList[0] +1), np.concatenate([np.linspace(nbSamplesList[0], endOfGraph, endOfGraph - nbSamplesList[0] +1) , [total_number_of_birds]*(np.maximum(0 , nbSamplesList[-1] - total_number_of_birds))]), color = 'r', linestyle = ':')
 
 
     patch = []
