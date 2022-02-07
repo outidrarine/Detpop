@@ -1,8 +1,6 @@
 # LIBRAIRIES
 
 import numpy as np
-import os
-import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib import patches
 from maad.sound import spectrogram
@@ -231,7 +229,7 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
     displayBestOfN(samplingNames, average_pertinences, diversities, criteria, bestOfN_step, nbSamplings, color_list)
 
 
-# Affichage du graph oracle
+# AFFICHAGE DU GRAPH ORACLE
 
 def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, color_list, root, J, Q):
     average_birds = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
@@ -259,12 +257,9 @@ def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_m
     patch = []
     for k, color in enumerate(color_list):
         patch.append(patches.Patch(color = color, label = sampling_names[k]))
-    patch.append(patches.Patch(color = 'red', hatch = ':', linewidth = 2, fill = False, linestyle = ':', label = "Oracle"))
+    patch.append(patches.Patch(color = 'red', linewidth = 2, fill = False, linestyle = ':', label = "Oracle"))
     plt.legend(handles = patch)
     plt.title("Oracle Graph")
-
-
-
 
 
 # AFFICHAGE DES VALEURS MOYENNES DES ECHANTILLONNAGES
