@@ -19,6 +19,8 @@ def applyPertinenceFunction(q, pertinenceFunction = 'identity'):
         return q
     elif pertinenceFunction == 'inverse':
         return 1 / (1 - q)
+    else:
+        raise ValueError('pertinenceFunction can only be "identity" or "inverse"')
 
 
 def compute_pertinence(sound, fe):
