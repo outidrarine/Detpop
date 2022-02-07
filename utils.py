@@ -1,6 +1,5 @@
 from logging import raiseExceptions
 import os
-import sys
 import numpy as np
 from scipy.io import wavfile
 import pandas as pd
@@ -38,7 +37,19 @@ def getFilenamesAtPositions(root, positions, with_root = False):
         else:
             return np.array(filenames)[positions]
 
+# Calcul de nombre total des birds 
 
+def get_all_birds(root):
+    col_list = ['Species Code']
+    set_of_birds = set()
+    
+    for root, dirnames, filenames in os.walk(root): 
+        for index_of_bird_file in filenames:
+            data = pd.read_csv('./BirdNET/'+index_of_bird_file, sep="\t",usecols = col_list)
+            new_birds_array = data['Species Code']
+            set_of_birds = set_of_birds.union(set(new_birds_array))
+    return set_of_birds
+    
 # Function to obtain all the filenames
 def getAllFilenames(root, with_root = False):
     for root, dirnames, filenames in os.walk(root):
@@ -109,6 +120,7 @@ def getAllDates(root, with_year = True):
 
 # Extract set of birds from samples
 
+# Extract set of birds from samples 
 def extract_birds(samples, root, bird_search_mode = 'single', bird_confidence_limit = 0.1):
     for root, dirnames, filenames in os.walk(root):
         birds_file_name = np.array(filenames)

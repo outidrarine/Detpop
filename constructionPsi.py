@@ -8,7 +8,7 @@ from maad.sound import spectrogram
 import os
 import h5py
 
-from utils import getPositionsOfFilenames, getSound, progressbar
+from utils import getPositionsOfFilenames, getSound, prog
 
 
 # Pertinence

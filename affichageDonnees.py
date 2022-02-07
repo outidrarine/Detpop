@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 from matplotlib import patches
 from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
+from utils import get_all_birds
 
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
@@ -234,7 +235,6 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
 
 def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, color_list, root, J, Q):
     average_birds = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
-    total_bird_iteration = np.zeros(nbSamplings)
     for k, nbSamples in enumerate(nbSamplesList):
         _, _, nbBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, J, Q, pertinenceFunction, bird_search_mode, verbose = True)
         for sampling_name in sampling_names:
@@ -264,18 +264,7 @@ def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_m
     plt.title("Oracle Graph")
 
 
-# Calcul de nombre total des birds 
 
-def get_all_birds(root):
-    col_list = ['Species Code']
-    set_of_birds = set()
-    
-    for root, dirnames, filenames in os.walk(root): 
-        for index_of_bird_file in filenames:
-            data = pd.read_csv('./BirdNET/'+index_of_bird_file, sep="\t",usecols = col_list)
-            new_birds_array = data['Species Code']
-            set_of_birds = set_of_birds.union(set(new_birds_array))
-    return set_of_birds
 
 # AFFICHAGE DES VALEURS MOYENNES DES ECHANTILLONNAGES
 
