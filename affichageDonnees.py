@@ -266,13 +266,14 @@ def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_m
 
 
 
+
 # AFFICHAGE DES VALEURS MOYENNES DES ECHANTILLONNAGES
 
 def displaySamplingsAverages(samplingNames, average_pertinences, diversities, average_birds):
 
     print()
 
-    for k, sampling_name in enumerate(samplingNames):
+    for sampling_name in samplingNames:
 
         print(sampling_name, ":")
 
