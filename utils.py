@@ -137,6 +137,9 @@ def extract_birds(samples, root, bird_search_mode = 'single', bird_confidence_li
 # AFFICHAGE D'UNE BARRE DE PROGRESSION
 
 def progressbar(max_progress, progress):
+    if max_progress == 0:
+        return
+
     sys.stdout.write('\r')
-    sys.stdout.write("[%-100s] %d%%" % ('='*round(progress / max_progress * 100), 100*progress/max_progress))
+    sys.stdout.write("[%-100s] %d%%" % ('=' * round(progress / max_progress * 100), 100 * progress / max_progress))
     sys.stdout.flush()
