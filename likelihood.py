@@ -22,5 +22,5 @@ def pertinenceLikelihood(samples, pertinenceFunction = 'identity', root = './Sou
     positions = getPositionsOfFilenames(root, samples)
 
     samplesPertinences = q[positions]
-    
+
     return np.prod(samplesPertinences / np.sum(q))

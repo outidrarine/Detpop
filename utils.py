@@ -3,6 +3,7 @@ import sys
 import numpy as np
 from scipy.io import wavfile
 import pandas as pd
+import IPython.display as ipd
 
 
 # Function to get the sound with filename
@@ -169,3 +170,9 @@ def progressbar(max_progress, progress):
     sys.stdout.write('\r')
     sys.stdout.write("[%-100s] %d%%" % ('=' * round(progress / max_progress * 100), 100 * progress / max_progress))
     sys.stdout.flush()
+
+
+# LECTURE D'UN FICHIER AUDIO
+
+def playSound(sound, fe):
+    ipd.display(ipd.Audio(sound, rate = fe))
