@@ -6,7 +6,7 @@ from dppy.finite_dpps import FiniteDPP
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 
-from constructionPsi import getPertinences, getpsi, compute_sample_pertinence, compute_diversity
+from constructionPsi import getDesciptors, getPertinences, getpsi, compute_sample_pertinence, compute_diversity
 from utils import getFilenamesAtPositions, extract_birds, progressbar
 
 
@@ -43,15 +43,16 @@ def sampling_random(nbSamples, root = './SoundDatabase', J = 8, Q = 3, pertinenc
 
 def sampling_kmeans(nbSamples, root = './SoundDatabase', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
-    psi = getpsi(verbose = False, J = J, Q = Q, pertinenceFunction = pertinenceFunction)
+    descriptor = getDesciptors(verbose = False, J = J, Q = Q)
+    pertinence = getPertinences(pertinenceFunction = pertinenceFunction, root = root, verbose = False)
 
-    kmeans = KMeans(n_clusters = nbSamples).fit(psi)
+    kmeans = KMeans(n_clusters = nbSamples, init = 'random').fit(descriptor, pertinence)
 
-    samples_positions, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, psi)
+    samples_positions, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, descriptor)
 
     samples = getFilenamesAtPositions(root, samples_positions)
 
-    criterion = kmeans.score(psi)
+    criterion = kmeans.score(descriptor, pertinence)
 
     return samples, criterion
 
@@ -75,7 +76,7 @@ def sampling_dpp(nbSamples, root = './SoundDatabase', J = 8, Q = 3, pertinenceFu
 
 # Calcul d'un echantillonnage
 
-def computeSampling(samplingName, nbSamples, J, Q, pertinenceFunction, birdSearchMode, root = './SoundDatabase'):
+def computeSampling(samplingName, nbSamples, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, root = './SoundDatabase'):
 
     samplings = {'Random': sampling_random, 'Pertinence': sampling_pertinence, 'K-means': sampling_kmeans, 'K-DPP': sampling_dpp}
     sampling = samplings[samplingName]
@@ -85,16 +86,16 @@ def computeSampling(samplingName, nbSamples, J, Q, pertinenceFunction, birdSearc
     averagePertinences = np.mean(compute_sample_pertinence(samples, root = root, pertinenceFunction = pertinenceFunction))
     diversity = compute_diversity(samples, root, J = J, Q = Q)
 
-    nbBirds = len(extract_birds(samples,'./BirdNET'))
+    nbBirds = len(extract_birds(samples, './BirdNET', bird_confidence_limit = birdConfidenceLimit, bird_search_mode = birdSearchMode))
     
-    return samplingName, nbSamples, J, Q, pertinenceFunction, birdSearchMode, averagePertinences, diversity, nbBirds, criterion
+    return samplingName, nbSamples, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, averagePertinences, diversity, nbBirds, criterion
 
 
 # Extraction de données depuis la dataframe
 
-def extractSamplings(df, nbSamplings, nbSamples, samplingName, J, Q, pertinenceFunction, birdSearchMode, verbose):
+def extractSamplings(df, nbSamplings, nbSamples, samplingName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, verbose):
 
-    dfMatchingRows = df.loc[(df['samplingName'] == samplingName) & (df['nbSamples'] == nbSamples) & (df['J'] == J) &(df['Q'] == Q) & (df['pertinenceFunction'] == pertinenceFunction) & (df['birdSearchMode'] == birdSearchMode)]
+    dfMatchingRows = df.loc[(df['samplingName'] == samplingName) & (df['nbSamples'] == nbSamples) & (df['J'] == J) &(df['Q'] == Q) & (df['pertinenceFunction'] == pertinenceFunction) & (df['birdSearchMode'] == birdSearchMode) & (df['birdConfidenceLimit'] == birdConfidenceLimit)]
     nbMatchingRows = len(dfMatchingRows)
     
     if nbMatchingRows >= nbSamplings:
@@ -104,20 +105,20 @@ def extractSamplings(df, nbSamplings, nbSamples, samplingName, J, Q, pertinenceF
         nbMissing = nbSamplings - nbMatchingRows
 
         if verbose:
-            print(f"Computation of {nbMissing} {samplingName} samplings with nbSamples = {nbSamples}, J = {J}, Q = {Q}, pertinenceFunction = {pertinenceFunction} and birdSearchMode = {birdSearchMode}")
+            print(f"Computation of {nbMissing} {samplingName} samplings with nbSamples = {nbSamples}, J = {J}, Q = {Q}, pertinenceFunction = {pertinenceFunction}, birdSearchMode = {birdSearchMode} and birdConfidenceLimit = {birdConfidenceLimit}")
 
         for k in range(nbMissing):
 
             if verbose:
                 progressbar(nbMissing - 1, k)
 
-            s_row = pd.Series(computeSampling(samplingName, nbSamples, J, Q, pertinenceFunction, birdSearchMode), index = df.columns)
+            s_row = pd.Series(computeSampling(samplingName, nbSamples, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit), index = df.columns)
             df = df.append(s_row, ignore_index = True)
         
         if verbose:
             print()
         
-        dfMatchingRows = df.loc[(df['samplingName'] == samplingName) & (df['nbSamples'] == nbSamples) & (df['J'] == J) &(df['Q'] == Q) & (df['pertinenceFunction'] == pertinenceFunction) & (df['birdSearchMode'] == birdSearchMode)]
+        dfMatchingRows = df.loc[(df['samplingName'] == samplingName) & (df['nbSamples'] == nbSamples) & (df['J'] == J) &(df['Q'] == Q) & (df['pertinenceFunction'] == pertinenceFunction) & (df['birdSearchMode'] == birdSearchMode)  & (df['birdConfidenceLimit'] == birdConfidenceLimit)]
 
     averagePertinenceArray = np.array(dfMatchingRows['averagePertinence'])
     diversityArray = np.array(dfMatchingRows['diversity'])
@@ -129,7 +130,7 @@ def extractSamplings(df, nbSamplings, nbSamples, samplingName, J, Q, pertinenceF
 
 # Sauvegarde et extraction des echantillonnages
 
-def getSamplings(nbSamplings, nbSamples, samplingNames, J, Q, pertinenceFunction, birdSearchMode, verbose = True):
+def getSamplings(nbSamplings, nbSamples, samplingNames, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, verbose = True):
 
     df = pd.read_csv('./persisted_data/samplings.csv')
 
@@ -139,7 +140,7 @@ def getSamplings(nbSamplings, nbSamples, samplingNames, J, Q, pertinenceFunction
     criterionArrays = np.array(np.zeros(nbSamplings), dtype = [(samplingName, None) for samplingName in samplingNames])
 
     for samplingName in samplingNames:
-        df, averagePertinenceArrays[samplingName], diversityArrays[samplingName], nbBirdsArrays[samplingName], criterionArrays[samplingName] = extractSamplings(df, nbSamplings, nbSamples, samplingName, J, Q, pertinenceFunction, birdSearchMode, verbose)
+        df, averagePertinenceArrays[samplingName], diversityArrays[samplingName], nbBirdsArrays[samplingName], criterionArrays[samplingName] = extractSamplings(df, nbSamplings, nbSamples, samplingName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, verbose)
 
     df.to_csv('./persisted_data/samplings.csv', index = False)
 

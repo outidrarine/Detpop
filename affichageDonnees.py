@@ -195,10 +195,10 @@ def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identit
 
 # COMPARAISON D'ÉCHANTILLONAGES
 
-def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = './SoundDatabase', J = 8, Q = 3, pertinenceFunction = 'identity', birdSearchMode = 'single', clouds_alpha = 0.3, pareto = True, bestOfN_step = 20):
+def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = './SoundDatabase', J = 8, Q = 3, pertinenceFunction = 'identity', birdSearchMode = 'single', birdConfidenceLimit = 0.1, clouds_alpha = 0.3, pareto = True, bestOfN_step = 20):
 
     # Calculs des échantillonages
-    average_pertinences, diversities, average_birds, criteria = getSamplings(nbSamplings, nbSamples, samplingNames, J, Q, pertinenceFunction, birdSearchMode)
+    average_pertinences, diversities, average_birds, criteria = getSamplings(nbSamplings, nbSamples, samplingNames, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit)
     
     # Affichages des valeurs moyennes
     displaySamplingsAverages(samplingNames, average_pertinences, diversities, average_birds)
@@ -234,7 +234,7 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
 def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, color_list, root, J, Q):
     average_birds = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
     for k, nbSamples in enumerate(nbSamplesList):
-        _, _, nbBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, J, Q, pertinenceFunction, bird_search_mode, verbose = True)
+        _, _, nbBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, J, Q, pertinenceFunction, bird_search_mode, birdConfidenceLimit = bird_confidence_limit, verbose = True)
         for sampling_name in sampling_names:
             average_birds[sampling_name][k] = np.mean(nbBirdsArrays[sampling_name])
     
