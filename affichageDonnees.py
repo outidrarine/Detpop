@@ -1,5 +1,6 @@
 # LIBRAIRIES
 
+from reprlib import aRepr
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import patches
@@ -322,13 +323,19 @@ def displaySamplingClouds(samplingNames, nbSamplings, average_pertinences, diver
 
     if pareto:
 
+        areaUnderParetoFront = {}
+        for k, sampling_name in enumerate(samplingNames):
+            paretoPointsX, paretoPointsY, _ = findParetoPoints(average_pertinences[sampling_name], diversities[sampling_name], np.array([sampling_name] * nbSamplings))
+            plt.plot(paretoPointsX, paretoPointsY, color = color_list[k], linestyle = ':')
+            areaUnderParetoFront[sampling_name] = computeAreaUnderParetoFront(paretoPointsX, paretoPointsY)
+
         listX = np.block([average_pertinences[sampling_name] for sampling_name in samplingNames])
         listY = np.block([diversities[sampling_name] for sampling_name in samplingNames])
         listSampling = np.block([np.array([sampling_name] * nbSamplings) for sampling_name in samplingNames])   
 
         paretoPointsX, paretoPointsY, paretoPointsSampling = findParetoPoints(listX, listY, listSampling)
 
-        plt.plot(paretoPointsX, paretoPointsY, color = 'r', linestyle = ':')
+        plt.plot(paretoPointsX, paretoPointsY, color = 'k', linestyle = ':')
 
         plt.show()
         
@@ -342,6 +349,10 @@ def displaySamplingClouds(samplingNames, nbSamplings, average_pertinences, diver
         print("Number of points in the Pareto front per sampling")
         for sampling_name in samplingNames:
             print(sampling_name, ":", nbParetoPoints[sampling_name])
+
+        print("\nArea under the Pareto front per sampling")
+        for sampling_name in samplingNames:
+            print(sampling_name, ":", areaUnderParetoFront[sampling_name])
 
     else:
         plt.show()
@@ -364,6 +375,22 @@ def findParetoPoints(listX, listY, listSampling):
     paretoPointsSampling = [point[2] for point in paretoPoints]
 
     return paretoPointsX, paretoPointsY, paretoPointsSampling
+
+
+# CALCUL DE L'AIRE SOUS LE FRONT DE PARETO
+
+def computeAreaUnderParetoFront(paretoPointsX, paretoPointsY):
+
+    paretoPointsX.insert(0, paretoPointsX[0])
+    paretoPointsY.insert(0, 0)
+
+    paretoPointsX.append(0)
+    paretoPointsY.append(paretoPointsY[-1])
+
+    # signe moins car les points sont avec x décroissant
+    area = -np.trapz(paretoPointsY, paretoPointsX)
+
+    return area
 
 
 # AFFICHAGE DES BEST OF N
