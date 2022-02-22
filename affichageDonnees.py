@@ -195,7 +195,7 @@ def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identit
 
 # COMPARAISON D'ÉCHANTILLONAGES
 
-def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = './SoundDatabase', J = 8, Q = 3, pertinenceFunction = 'identity', birdSearchMode = 'single', birdConfidenceLimit = 0.1, clouds_alpha = 0.3, pareto = True, bestOfN_step = 20):
+def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = './SoundDatabase', J = 8, Q = 3, pertinenceFunction = 'identity', birdSearchMode = 'single', birdConfidenceLimit = 0.1, pareto = True, bestOfN_step = 20):
 
     # Calculs des échantillonages
     average_pertinences, diversities, average_birds, criteria = getSamplings(nbSamplings, nbSamples, samplingNames, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit)
@@ -203,27 +203,11 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
     # Affichages des valeurs moyennes
     displaySamplingsAverages(samplingNames, average_pertinences, diversities, average_birds)
 
-    # Remise des pertinences et diversités entre 0 et 1
-    qmin, qmax, dmin, dmax = float('inf'), 0, float('inf'), 0
-    for samplingName in samplingNames:
-        if np.min(average_pertinences[samplingName]) < qmin:
-            qmin = np.min(average_pertinences[samplingName])
-        if np.max(average_pertinences[samplingName]) > qmax:
-            qmax = np.max(average_pertinences[samplingName])
-        if np.min(diversities[samplingName]) < dmin:
-            dmin = np.min(diversities[samplingName])
-        if np.max(diversities[samplingName]) > dmax:
-            dmax = np.max(diversities[samplingName])
-
-    for samplingName in samplingNames:
-        average_pertinences[samplingName] = (average_pertinences[samplingName] - qmin) / (qmax - qmin)
-        diversities[samplingName] = (diversities[samplingName] - dmin) / (dmax - dmin)
-
     # Affichages des histogrammes
     displaySamplingsHistograms(samplingNames, average_pertinences, diversities)
 
     # Affichage des nuages de points des échantillonnages
-    displaySamplingClouds(samplingNames, nbSamplings, average_pertinences, diversities, clouds_alpha, color_list, pareto = pareto)
+    displaySamplingClouds(samplingNames, nbSamplings, average_pertinences, diversities, color_list, pareto = pareto)
 
     # Affichage des best of N
     displayBestOfN(samplingNames, average_pertinences, diversities, criteria, bestOfN_step, nbSamplings, color_list)
@@ -283,6 +267,18 @@ def displaySamplingsAverages(samplingNames, average_pertinences, diversities, av
 
 def displaySamplingsHistograms(samplingNames, average_pertinences, diversities):
 
+    # Determination des pertinences et diversités maximales
+    qmin, qmax, dmin, dmax = float('inf'), 0, float('inf'), 0
+    for samplingName in samplingNames:
+        if np.min(average_pertinences[samplingName]) < qmin:
+            qmin = np.min(average_pertinences[samplingName])
+        if np.max(average_pertinences[samplingName]) > qmax:
+            qmax = np.max(average_pertinences[samplingName])
+        if np.min(diversities[samplingName]) < dmin:
+            dmin = np.min(diversities[samplingName])
+        if np.max(diversities[samplingName]) > dmax:
+            dmax = np.max(diversities[samplingName])
+
     cols_names = ['Pertinence', 'Diversity']
     rows_names = samplingNames
 
@@ -296,9 +292,9 @@ def displaySamplingsHistograms(samplingNames, average_pertinences, diversities):
 
     for k, sampling_name in enumerate(samplingNames):
 
-        axes[k, 0].hist(average_pertinences[sampling_name], bins = 40, range = (0, 1))
+        axes[k, 0].hist(average_pertinences[sampling_name], bins = 40, range = (qmin, qmax))
 
-        axes[k, 1].hist(diversities[sampling_name], bins = 40, range = (0, 1))
+        axes[k, 1].hist(diversities[sampling_name], bins = 40, range = (dmin, dmax))
 
     plt.suptitle("Pertinences and diversities per samplings")
     plt.show()
@@ -306,20 +302,21 @@ def displaySamplingsHistograms(samplingNames, average_pertinences, diversities):
 
 # REPRÉSENTATION DIVERSITÉ/PERTINENCE DES ÉCHANTILLONNAGES
 
-def displaySamplingClouds(samplingNames, nbSamplings, average_pertinences, diversities, alpha, color_list, pareto = True):
+def displaySamplingClouds(samplingNames, nbSamplings, average_pertinences, diversities, color_list, pareto = True):
 
     plt.figure(figsize=(10, 10))
+
+    alpha = 200 / nbSamplings
 
     for k, sampling_name in enumerate(samplingNames):
         plt.scatter(average_pertinences[sampling_name], diversities[sampling_name], alpha = alpha, color = color_list[k])
 
-    plt.xlim(0, 1)
-    plt.ylim(0, 1)
-
     plt.xlabel("Pertinence")
     plt.ylabel("Diversité")
     
-    plt.legend(samplingNames)
+    legend = plt.legend(samplingNames)
+    for l in legend.legendHandles:
+        l.set_alpha(1)
 
     plt.title("Samplings repartition in the pertinence/diversity plan")
 
@@ -385,9 +382,6 @@ def displayBestOfN(samplingNames, average_pertinences, average_diversities, crit
         plt.plot(listX, listY, color = color_list[i], marker = 'o')
         plt.scatter(listX[0], listY[0], color = color_list[i], marker = 'D')
         plt.scatter(listX[-1], listY[-1], color = color_list[i], marker = '*')
-
-    plt.xlim(0, 1)
-    plt.ylim(0, 1)
 
     plt.xlabel("Pertinence")
     plt.ylabel("Diversité")
