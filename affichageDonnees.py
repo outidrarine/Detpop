@@ -223,7 +223,7 @@ def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_m
         for sampling_name in sampling_names:
             average_birds[sampling_name][k] = np.mean(nbBirdsArrays[sampling_name])
     
-    total_number_of_birds = len(get_all_birds(root))
+    total_number_of_birds = len(get_all_birds(root, bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit))
     plt.figure(figsize=(10, 10))
     for sampling_name in sampling_names:
 

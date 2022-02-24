@@ -45,15 +45,26 @@ def getFilenamesAtPositions(root, positions, with_root = False):
 
 # Calcul de nombre total des birds 
 
-def get_all_birds(root):
-    col_list = ['Species Code']
+def get_all_birds(root, bird_search_mode = 'single', bird_confidence_limit = 0.1):
+    col_list = ['Species Code', 'Confidence']
     set_of_birds = set()
     
     for root, dirnames, filenames in os.walk(root): 
         for index_of_bird_file in filenames:
             data = pd.read_csv('./BirdNET/'+index_of_bird_file, sep="\t",usecols = col_list)
-            new_birds_array = data['Species Code']
-            set_of_birds = set_of_birds.union(set(new_birds_array))
+            new_birds_array = data[['Species Code','Confidence']]
+            
+            if len(new_birds_array) > 0:
+                if(bird_search_mode == 'single'):
+                    new_birds_array = new_birds_array['Species Code']
+                    new_birds_array = {new_birds_array[0]}
+                elif(bird_search_mode == 'multi'):
+                    new_birds_array = new_birds_array[new_birds_array['Confidence'] > bird_confidence_limit]
+                    new_birds_array = new_birds_array['Species Code']
+                else:
+                    raise ValueError('mode can only be "single" or "multi"')
+                set_of_birds = set_of_birds.union(set(new_birds_array))
+
     return set_of_birds
 
 
