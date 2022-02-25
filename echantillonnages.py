@@ -6,7 +6,7 @@ from dppy.finite_dpps import FiniteDPP
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 
-from constructionPsi import getDesciptors, getPertinences, getpsi, compute_sample_pertinence, compute_diversity
+from constructionPsi import getDescriptors, getPertinences, getpsi, compute_sample_pertinence, compute_diversity
 from utils import getFilenamesAtPositions, extract_birds, progressbar
 
 
@@ -43,7 +43,7 @@ def sampling_random(nbSamples, root = './SoundDatabase', J = 8, Q = 3, pertinenc
 
 def sampling_kmeans(nbSamples, root = './SoundDatabase', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
-    descriptor = getDesciptors(verbose = False, J = J, Q = Q)
+    descriptor = getDescriptors(verbose = False, J = J, Q = Q)
     pertinence = getPertinences(pertinenceFunction = pertinenceFunction, root = root, verbose = False)
 
     kmeans = KMeans(n_clusters = nbSamples, init = 'random').fit(descriptor, pertinence)

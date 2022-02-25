@@ -10,7 +10,7 @@ from utils import get_all_birds
 import os
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
-from constructionPsi import compute_sample_pertinence, compute_diversity, getPertinences, get_all_diversity
+from constructionPsi import compute_sample_pertinence, compute_diversity, getDescriptors, getPertinences, get_all_diversity
 from echantillonnages import getSamplings
 
 # SPECTROGRAMME
@@ -478,3 +478,22 @@ def displayBirdsOverTime(root, bird_search_mode, bird_confidence_limit):
         plt.ylabel("Number of birds")
         plt.title("Number of birds over time")
         plt.show() 
+
+
+# AFFICHAGE VALEURS PROPRES DESCRIPTEUR
+
+def displayEigenvalues(nbEigenvalues = 10, J = 8, Q = 3, root = './SoundDatabase', threshold = 0.9):
+
+    # Get the eigenvalues
+    descriptors = getDescriptors(J = J, Q = Q, root = root, verbose = False)
+    eigenvalues, _ = np.linalg.eig(descriptors.dot(descriptors.T))
+    eigenvalues = np.abs(eigenvalues)
+    eigenvalues[::-1].sort()
+
+    sum_eigenvalues = np.cumsum(eigenvalues) / np.sum(eigenvalues)
+
+    # Display the eigenvalues
+    plt.plot(sum_eigenvalues[0:nbEigenvalues])
+    plt.hlines(threshold, 0, nbEigenvalues - 1, linestyles = ':')
+
+    print(f"Nombres de valeurs propres nécessaires pour expliquer {round(threshold * 100)} % de la variance : {np.min(np.where(sum_eigenvalues > threshold))}")

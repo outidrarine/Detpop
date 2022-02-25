@@ -117,7 +117,7 @@ def compute_descriptors(root, J, Q, duration, nbSounds, verbose = True):
     return np.array(descriptors)
 
 
-def getDesciptors(J = 8, Q = 3, root = './SoundDatabase', verbose = True):
+def getDescriptors(J = 8, Q = 3, root = './SoundDatabase', verbose = True):
 
     persisted_descriptors = h5py.File("./persisted_data/descriptors.hdf5", "a")
 
