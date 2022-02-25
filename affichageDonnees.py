@@ -7,7 +7,7 @@ from matplotlib import patches
 from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
 from utils import get_all_birds
-
+import os
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
 from constructionPsi import compute_sample_pertinence, compute_diversity, getPertinences, get_all_diversity
@@ -437,3 +437,44 @@ def computeBestOfN(samplingNames, average_pertinences, average_diversities, crit
             bestOfN[sampling_name][:, k] = x, y
     
     return bestOfN
+
+# Display birds over time
+def displayBirdsOverTime(root, bird_search_mode, bird_confidence_limit):
+    
+    for root, dirnames, filenames in os.walk(root):
+        days = []
+        hours = []
+        distinctHours = set()
+        for filename in filenames:
+            currentDay, currentHour = getDateFromFilename(filename).split(' ')
+            days.append(currentDay)
+            hours.append(currentHour)
+            distinctHours = distinctHours.union(currentHour.split(':'))
+        setOfDays = set(days)
+        indicesOfDays = []
+        for i, distinctDay in enumerate(setOfDays):
+            indicesOfDays.append(list(filter(lambda x: days[x] == distinctDay, range(len(days)))))
+        timesOfDays = []
+        for indicesOfDay in indicesOfDays:
+            timesOfDays.append([hours[i] for i in indicesOfDay])
+        hoursPerDay = []
+        for distinctHour in distinctHours:
+            for timeOfDay in timesOfDays:
+                hoursPerDay.append(len([i for i in timeOfDay if i.split(':')[0] == distinctHour]))
+        startOfRange = 0
+        labelsOfHours = []
+        numberOfBirdsPerHour = []
+        for hour in hoursPerDay:
+            labelsOfHours.append( str(hours[startOfRange]) + str(startOfRange))
+            numberOfBirdsPerHour.append(len(extract_birds(filenames[startOfRange : startOfRange + hour], root = './BirdNET', bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)))
+            startOfRange = startOfRange + hour
+
+        plt.figure(figsize=(20, 10))
+        plt.plot(numberOfBirdsPerHour)
+        dates = ['midnight', 'noon', 'midnight', 'noon', 'midnight', 'noon', 'midnight']
+        plt.xticks([len(numberOfBirdsPerHour)/6 * k for k in range(7)], dates)
+        plt.vlines([len(numberOfBirdsPerHour)/3 * k for k in range(4)], 0, max(numberOfBirdsPerHour), 'g', ':')
+        plt.xticks(rotation=45)
+        plt.ylabel("Number of birds")
+        plt.title("Number of birds over time")
+        plt.show() 
