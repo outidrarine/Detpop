@@ -82,8 +82,9 @@ def displayPolarSamples(samples):
 # TRACÉ DE LA PERTINENCE
 
 def displayPertinences(pertinenceFunction = 'identity', samples = [], root = './SoundDatabase'):
+def displayPertinences(pertinenceFunction = 'identity', samples = [], root = './SoundDatabase', windowLenghth = 1):
 
-    q = getPertinences(verbose = False, pertinenceFunction = pertinenceFunction)
+    q = getPertinences(verbose = False, pertinenceFunction = pertinenceFunction, windowLenghth = windowLenghth)
 
     nbSounds = len(q)
 
@@ -438,62 +439,3 @@ def computeBestOfN(samplingNames, average_pertinences, average_diversities, crit
     
     return bestOfN
 
-# Display birds over time
-def displayBirdsOverTime(root, bird_search_mode, bird_confidence_limit):
-    
-    for root, dirnames, filenames in os.walk(root):
-        days = []
-        hours = []
-        distinctHours = set()
-        for filename in filenames:
-            currentDay, currentHour = getDateFromFilename(filename).split(' ')
-            days.append(currentDay)
-            hours.append(currentHour)
-            distinctHours = distinctHours.union(currentHour.split(':'))
-        setOfDays = set(days)
-        indicesOfDays = []
-        for i, distinctDay in enumerate(setOfDays):
-            indicesOfDays.append(list(filter(lambda x: days[x] == distinctDay, range(len(days)))))
-        timesOfDays = []
-        for indicesOfDay in indicesOfDays:
-            timesOfDays.append([hours[i] for i in indicesOfDay])
-        hoursPerDay = []
-        for distinctHour in distinctHours:
-            for timeOfDay in timesOfDays:
-                hoursPerDay.append(len([i for i in timeOfDay if i.split(':')[0] == distinctHour]))
-        startOfRange = 0
-        labelsOfHours = []
-        numberOfBirdsPerHour = []
-        for hour in hoursPerDay:
-            labelsOfHours.append( str(hours[startOfRange]) + str(startOfRange))
-            numberOfBirdsPerHour.append(len(extract_birds(filenames[startOfRange : startOfRange + hour], root = './BirdNET', bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)))
-            startOfRange = startOfRange + hour
-
-        plt.figure(figsize=(20, 10))
-        plt.plot(numberOfBirdsPerHour)
-        dates = ['midnight', 'noon', 'midnight', 'noon', 'midnight', 'noon', 'midnight']
-        plt.xticks([len(numberOfBirdsPerHour)/6 * k for k in range(7)], dates)
-        plt.vlines([len(numberOfBirdsPerHour)/3 * k for k in range(4)], 0, max(numberOfBirdsPerHour), 'g', ':')
-        plt.xticks(rotation=45)
-        plt.ylabel("Number of birds")
-        plt.title("Number of birds over time")
-        plt.show() 
-
-
-# AFFICHAGE VALEURS PROPRES DESCRIPTEUR
-
-def displayEigenvalues(nbEigenvalues = 10, J = 8, Q = 3, root = './SoundDatabase', threshold = 0.9):
-
-    # Get the eigenvalues
-    descriptors = getDescriptors(J = J, Q = Q, root = root, verbose = False)
-    eigenvalues, _ = np.linalg.eig(descriptors.dot(descriptors.T))
-    eigenvalues = np.abs(eigenvalues)
-    eigenvalues[::-1].sort()
-
-    sum_eigenvalues = np.cumsum(eigenvalues) / np.sum(eigenvalues)
-
-    # Display the eigenvalues
-    plt.plot(sum_eigenvalues[0:nbEigenvalues])
-    plt.hlines(threshold, 0, nbEigenvalues - 1, linestyles = ':')
-
-    print(f"Nombres de valeurs propres nécessaires pour expliquer {round(threshold * 100)} % de la variance : {np.min(np.where(sum_eigenvalues > threshold))}")

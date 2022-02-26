@@ -50,7 +50,7 @@ def compute_sample_pertinence(samples, root = './SoundDatabase', pertinenceFunct
     return q[samplesPositions]
 
 
-def getPertinences(pertinenceFunction = 'identity', root = './SoundDatabase', verbose = True):
+def getPertinences(pertinenceFunction = 'identity', root = './SoundDatabase', verbose = True, windowLenghth = 1):
 
     persisted_pertinences = h5py.File("./persisted_data/pertinences.hdf5", "a")
 
@@ -71,8 +71,10 @@ def getPertinences(pertinenceFunction = 'identity', root = './SoundDatabase', ve
         persisted_pertinences.create_dataset(pertinences_name, data = pertinences)
 
     persisted_pertinences.close()
-
     pertinences = applyPertinenceFunction(pertinences, pertinenceFunction = pertinenceFunction)
+    if(windowLenghth != 1):
+        pertinences = np.convolve(pertinences,np.ones(windowLenghth)/windowLenghth, 'same')
+
 
     return pertinences
 
@@ -143,7 +145,7 @@ def getDescriptors(J = 8, Q = 3, root = './SoundDatabase', verbose = True):
 
 def getpsi(J = 8, Q = 3, verbose = True, root = './SoundDatabase', pertinenceFunction = 'identity'):
 
-    descriptors = getDesciptors(J = J, Q = Q, root = root, verbose = verbose)
+    descriptors = getDescriptors(J = J, Q = Q, root = root, verbose = verbose)
     pertinences = getPertinences(root = root, pertinenceFunction = pertinenceFunction, verbose = verbose)
     
     pertinences = np.tile(pertinences, (descriptors.shape[1], 1)).T
