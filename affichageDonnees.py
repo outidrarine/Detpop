@@ -8,6 +8,7 @@ from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
 from utils import get_all_birds
 import os
+from scipy.ndimage import interpolation
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
 from constructionPsi import compute_sample_pertinence, compute_diversity, getDescriptors, getPertinences, get_all_diversity
@@ -81,7 +82,6 @@ def displayPolarSamples(samples):
 
 # TRACÉ DE LA PERTINENCE
 
-def displayPertinences(pertinenceFunction = 'identity', samples = [], root = './SoundDatabase'):
 def displayPertinences(pertinenceFunction = 'identity', samples = [], root = './SoundDatabase', windowLenghth = 1):
 
     q = getPertinences(verbose = False, pertinenceFunction = pertinenceFunction, windowLenghth = windowLenghth)
@@ -99,8 +99,8 @@ def displayPertinences(pertinenceFunction = 'identity', samples = [], root = './
     dates = ['midnight', 'noon', 'midnight', 'noon', 'midnight', 'noon', 'midnight']
     plt.xticks([nbSounds/6 * k for k in range(7)], dates)
     plt.ylabel('Pertinence')
-    
-    plt.hlines(mean_pertinence, 0, nbSounds, 'r')
+    if(samples != []):
+        plt.hlines(mean_pertinence, 0, nbSounds, 'r')
     plt.vlines([nbSounds/3 * k for k in range(4)], 0, max_pertinence, 'g', ':')
 
     # Affichages de points sur la courbe
@@ -439,3 +439,63 @@ def computeBestOfN(samplingNames, average_pertinences, average_diversities, crit
     
     return bestOfN
 
+# Display birds over time
+def displayBirdsOverTime(root, bird_search_mode, bird_confidence_limit, numberOfHours = 1, withPertinenceCurve = True, displayBirdsGraphToo = True, windowLenghthForPertinence = 5):
+    
+    for root, dirnames, filenames in os.walk(root):
+        days = []
+        hours = []
+        distinctHours = set()
+        for filename in filenames:
+            currentDay, currentHour = getDateFromFilename(filename).split(' ')
+            days.append(currentDay)
+            hours.append(currentHour)
+            distinctHours = distinctHours.union(currentHour.split(':'))
+        setOfDays = set(days)
+        indicesOfDays = []
+        for i, distinctDay in enumerate(setOfDays):
+            indicesOfDays.append(list(filter(lambda x: days[x] == distinctDay, range(len(days)))))
+        timesOfDays = []
+        for indicesOfDay in indicesOfDays:
+            timesOfDays.append([hours[i] for i in indicesOfDay])
+        hoursPerDay = []
+        for distinctHour in distinctHours:
+            for timeOfDay in timesOfDays:
+                hoursPerDay.append(len([i for i in timeOfDay if i.split(':')[0] == distinctHour]))
+        
+        startOfRange = 0
+        numberOfBirdsPerHour = []
+        for i in range(len(hoursPerDay) // numberOfHours):
+            numberOfBirdsPerHour.append(len(extract_birds(filenames[startOfRange : startOfRange + hoursPerDay[i]*numberOfHours], root = './BirdNET', bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)))
+            startOfRange = startOfRange + hoursPerDay[i]*numberOfHours
+        if(withPertinenceCurve):
+            displayPertinences(pertinenceFunction = 'identity', samples = [], windowLenghth = windowLenghthForPertinence)
+        q = getPertinences(verbose = False, pertinenceFunction = 'identity', windowLenghth = windowLenghthForPertinence)
+
+        #q = q.reshape(-1,4).mean(axis = 1)
+        newSize = len(q)/len(numberOfBirdsPerHour)
+        dates = ['midnight', 'noon', 'midnight', 'noon', 'midnight', 'noon', 'midnight']
+        if(displayBirdsGraphToo):
+            plt.figure(figsize = (15, 7))
+            ax = plt.axes()
+            plt.plot(numberOfBirdsPerHour)
+            plt.xticks([len(numberOfBirdsPerHour)/(6) * k for k in range(7)], dates)
+            plt.vlines([len(numberOfBirdsPerHour)/(3) * k for k in range(4)], 0, max(numberOfBirdsPerHour), 'g', ':')
+            plt.xticks(rotation=45)
+            plt.ylabel("Number of birds")
+            plt.title("Number of birds over time")
+            plt.show()
+        
+        fig, ax1 = plt.subplots(figsize = (15, 7))
+        numberOfBirdsPerHour = interpolation.zoom(numberOfBirdsPerHour, newSize) # on interpole pour que les deux graphes à afficher aient la meme taille
+        numberOfBirdsPerHour = np.abs(numberOfBirdsPerHour) # l'interpolation donne des nombres negatif parfois
+        color = 'tab:red'
+        ax1.set_ylabel("Number of birds")
+        ax1.plot(numberOfBirdsPerHour)
+        plt.xticks([len(numberOfBirdsPerHour)/(6) * k for k in range(7)], dates)
+        plt.vlines([len(numberOfBirdsPerHour)/(3) * k for k in range(4)], 0, max(numberOfBirdsPerHour), 'g', ':')
+        plt.xticks(rotation=45)
+        ax2 = ax1.twinx()
+        ax2.plot(q, color = color)
+        ax2.tick_params(axis='y', labelcolor=color)
+        ax2.set_ylabel('Pertinence', color=color)
