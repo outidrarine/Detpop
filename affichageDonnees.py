@@ -499,3 +499,20 @@ def displayBirdsOverTime(root, bird_search_mode, bird_confidence_limit, numberOf
         ax2.plot(q, color = color)
         ax2.tick_params(axis='y', labelcolor=color)
         ax2.set_ylabel('Pertinence', color=color)
+
+# Display a historam with pertinences and number of birds
+def showPertinenceWithBirdsNumberHistogram(root ,bird_search_mode, bird_confidence_limit, windowLenghthForPertinence):
+    for root, dirnames, filenames in os.walk(root):
+        q = getPertinences(verbose = False, pertinenceFunction = 'identity', windowLenghth = windowLenghthForPertinence)
+        numberOfBirds = []
+        for file in filenames:
+            numberOfBirds.append(len(extract_birds(file, root = './BirdNET', bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)))
+        samplesWithNoBirds = np.where(np.asarray(numberOfBirds) == 0)
+        samplesWithBirds = np.where(np.asarray(numberOfBirds) != 0)
+
+        plt.figure(figsize = (15, 7))
+        plt.hist([q[samplesWithBirds], q[samplesWithNoBirds]],bins = 15, alpha = 0.9, label = ['samples with birds', 'Samples with no birds'])
+        #plt.hist(q[samplesWithNoBirds],bins = 15, alpha = 0.9, label = 'Samples with no birds')
+        plt.xlabel('Pertinence')
+        plt.ylabel('Number of occurences')
+        plt.legend()
