@@ -516,3 +516,22 @@ def showPertinenceWithBirdsNumberHistogram(root ,bird_search_mode, bird_confiden
         plt.xlabel('Pertinence')
         plt.ylabel('Number of occurences')
         plt.legend()
+
+
+# AFFICHAGE VALEURS PROPRES DESCRIPTEUR
+
+def displayEigenvalues(nbEigenvalues = 10, J = 8, Q = 3, root = './SoundDatabase', threshold = 0.9):
+
+    # Get the eigenvalues
+    descriptors = getDescriptors(J = J, Q = Q, root = root, verbose = False)
+    eigenvalues, _ = np.linalg.eig(descriptors.dot(descriptors.T))
+    eigenvalues = np.abs(eigenvalues)
+    eigenvalues[::-1].sort()
+
+    sum_eigenvalues = np.cumsum(eigenvalues) / np.sum(eigenvalues)
+
+    # Display the eigenvalues
+    plt.plot(sum_eigenvalues[0:nbEigenvalues])
+    plt.hlines(threshold, 0, nbEigenvalues - 1, linestyles = ':')
+
+    print(f"Nombres de valeurs propres nécessaires pour expliquer {round(threshold * 100)} % de la variance : {np.min(np.where(sum_eigenvalues > threshold))}")
