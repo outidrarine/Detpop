@@ -14,13 +14,15 @@ from utils import getPositionsOfFilenames, getSound
 # Pertinence
 
 def applyPertinenceFunction(q, pertinenceFunction = 'identity'):
-
+    
     if pertinenceFunction == 'identity':
         return q
     elif pertinenceFunction == 'inverse':
         return 1 / (1 - q)
+    elif pertinenceFunction == 'threshold':
+        return np.where(q >= 2/3, q, 0)
     else:
-        raise ValueError('pertinenceFunction can only be "identity" or "inverse"')
+        raise ValueError('pertinenceFunction can only be "identity", "inverse" or "threshold"')
 
 
 def compute_pertinence(sound, fe):
