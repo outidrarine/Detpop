@@ -46,7 +46,7 @@ def sampling_kmeans(nbSamples, root = './SoundDatabase', J = 8, Q = 3, pertinenc
     descriptor = getDescriptors(verbose = False, J = J, Q = Q)
     pertinence = getPertinences(pertinenceFunction = pertinenceFunction, root = root, verbose = False)
 
-    kmeans = KMeans(n_clusters = nbSamples, init = 'random').fit(descriptor, pertinence)
+    kmeans = KMeans(n_clusters = nbSamples, init = 'random', n_init = 1).fit(descriptor, pertinence)
 
     samples_positions, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, descriptor)
 
