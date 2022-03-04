@@ -188,7 +188,7 @@ def get_all_diversity(root = './SoundDatabase', J = 8, Q = 3, nbSounds = 432, ve
 
     persisted_diversities = h5py.File("./persisted_data/diversities.hdf5", "a")
 
-    diversities_name = "diversities_{}_{}".format(J, Q)
+    diversities_name = f"diversities_{J}_{Q}"
 
     if diversities_name in persisted_diversities:
         if verbose:
