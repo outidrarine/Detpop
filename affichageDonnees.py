@@ -118,9 +118,9 @@ def scatter_over_pertinence(q, root, samples=[]):
 
 # TRACÉ DE LA MATRICE DES DIVERSITES
 
-def displayDiversities(samples = [], root = './SoundDatabase', J = 8, Q = 3):
+def displayDiversities(samples = [], root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
 
-    diversities = get_all_diversity(root = root, J = J, Q = Q, verbose = False)
+    diversities = get_all_diversity(root = root, descriptorName = descriptorName, J = J, Q = Q, verbose = False)
 
     nbSounds = diversities.shape[0]
 
@@ -160,11 +160,11 @@ def scatter_over_diversity(root, samples=[]):
 
 # AFFICHAGES D'INFORMATIONS SUR UN ECHANTILLONAGE
 
-def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identity', J = 8, Q = 3, bird_search_mode = 'single', bird_confidence_limit = 0.1):
+def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identity', descriptorName = 'scalogramStat1', J = 8, Q = 3, bird_search_mode = 'single', bird_confidence_limit = 0.1):
 
     # Initialisation et calculs
     root = './SoundDatabase'
-    samples, _ = sampling_function(nbSamples)
+    samples, _ = sampling_function(nbSamples, descriptorName = descriptorName, J = J, Q = Q)
 
     pertinences = compute_sample_pertinence(samples, root = root, pertinenceFunction = pertinenceFunction)
 
@@ -177,7 +177,7 @@ def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identit
     print("Average pertinence:", np.mean(pertinences))
     print()
 
-    print("diversity:", compute_diversity(samples, root, J = J, Q = Q))
+    print("diversity:", compute_diversity(samples, root, descriptorName = descriptorName, J = J, Q = Q))
     print()
 
     # Affichages sur figure polaire
@@ -187,7 +187,7 @@ def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identit
     displayPertinences(pertinenceFunction = pertinenceFunction, samples = samples, root = root)
 
     # Affichage sur figure diversités
-    displayDiversities(samples, J = J, Q = Q)
+    displayDiversities(samples, descriptorName = descriptorName, J = J, Q = Q)
 
     # Extraction des oiseaux 
     birds_set = extract_birds(samples, './BirdNET', bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)
@@ -197,10 +197,10 @@ def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identit
 
 # COMPARAISON D'ÉCHANTILLONAGES
 
-def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = './SoundDatabase', J = 8, Q = 3, pertinenceFunction = 'identity', birdSearchMode = 'single', birdConfidenceLimit = 0.1, pareto = True, bestOfN_step = 20):
+def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity', birdSearchMode = 'single', birdConfidenceLimit = 0.1, pareto = True, bestOfN_step = 20):
 
     # Calculs des échantillonages
-    average_pertinences, diversities, average_birds, criteria = getSamplings(nbSamplings, nbSamples, samplingNames, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit)
+    average_pertinences, diversities, average_birds, criteria = getSamplings(nbSamplings, nbSamples, samplingNames, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit)
     
     # Affichages des valeurs moyennes
     displaySamplingsAverages(samplingNames, average_pertinences, diversities, average_birds)
@@ -217,10 +217,10 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
 
 # AFFICHAGE DU GRAPH ORACLE
 
-def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, color_list, root, J, Q):
+def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, color_list, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
     average_birds = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
     for k, nbSamples in enumerate(nbSamplesList):
-        _, _, nbBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, J, Q, pertinenceFunction, bird_search_mode, birdConfidenceLimit = bird_confidence_limit, verbose = True)
+        _, _, nbBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, descriptorName, J, Q, pertinenceFunction, bird_search_mode, birdConfidenceLimit = bird_confidence_limit, verbose = True)
         for sampling_name in sampling_names:
             average_birds[sampling_name][k] = np.mean(nbBirdsArrays[sampling_name])
     
@@ -520,10 +520,10 @@ def showPertinenceWithBirdsNumberHistogram(root ,bird_search_mode, bird_confiden
 
 # AFFICHAGE VALEURS PROPRES DESCRIPTEUR
 
-def displayEigenvalues(nbEigenvalues = 10, J = 8, Q = 3, root = './SoundDatabase', threshold = 0.9):
+def displayEigenvalues(nbEigenvalues = 10, descriptorName = 'scalogramStat1', J = 8, Q = 3, root = './SoundDatabase', threshold = 0.9):
 
     # Get the eigenvalues
-    descriptors = getDescriptors(J = J, Q = Q, root = root, verbose = False)
+    descriptors = getDescriptors(descriptorName = descriptorName, J = J, Q = Q, root = root, verbose = False)
     eigenvalues, _ = np.linalg.eig(descriptors.dot(descriptors.T))
     eigenvalues = np.abs(eigenvalues)
     eigenvalues[::-1].sort()

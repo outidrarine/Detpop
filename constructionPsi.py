@@ -7,6 +7,7 @@ from maad.features import tfsd
 from maad.sound import spectrogram
 import os
 import h5py
+from scipy import stats
 
 from utils import getPositionsOfFilenames, getSound
 
@@ -83,24 +84,46 @@ def getPertinences(pertinenceFunction = 'identity', root = './SoundDatabase', ve
 
 # Descripteur
 
-def compute_descriptor(sound, J, Q):
+def compute_descriptor(sound, descriptorName, J, Q):
     
-    T = sound.shape[-1]
+    if (descriptorName == 'scalogramStat1' or descriptorName == 'scalogramStat4'):
 
-    scattering = Scattering1D(J, T, Q)
+        T = sound.shape[-1]
 
-    scalogram = scattering(sound / np.max(np.abs(sound)))
+        scattering = Scattering1D(J, T, Q)
 
-    order2 = np.where(scattering.meta()['order'] == 2)
+        scalogram = scattering(sound / np.max(np.abs(sound)))
+        order2 = np.where(scattering.meta()['order'] == 2)
+        scalogram2 = scalogram[order2]
 
-    descriptor = scalogram[order2]
-    descriptor = np.mean(descriptor, axis = 1)
-    descriptor = descriptor / np.linalg.norm(descriptor)
+        avg = np.mean(scalogram2, axis = 1)
+        avg = avg / np.linalg.norm(avg)
 
-    return descriptor
+        if (descriptorName == 'scalogramStat1'):
+            return avg
+
+        else:
+
+            standard_deviation = np.std(scalogram2, axis = 1)
+            standard_deviation = standard_deviation / np.linalg.norm(standard_deviation)
+            
+            skewness = stats.skew(scalogram2, axis = 1)
+            skewness = skewness / np.linalg.norm(skewness)
+
+            kurtosis = stats.kurtosis(scalogram2, axis = 1)
+            kurtosis = kurtosis / np.linalg.norm(kurtosis)
 
 
-def compute_descriptors(root, J, Q, duration, nbSounds, verbose = True):
+            descriptor = np.ravel([avg, standard_deviation, skewness, kurtosis])
+            descriptor = descriptor / np.linalg.norm(descriptor)
+
+            return descriptor
+    
+    else:
+        raise ValueError(f"descriptorName: expected 'scalogramStat1' or 'scalogramStat4' but got '{descriptorName}'")
+
+
+def compute_descriptors(root, descriptorName, J, Q, duration, nbSounds, verbose = True):
     
     descriptors = [0] * nbSounds
     
@@ -113,7 +136,7 @@ def compute_descriptors(root, J, Q, duration, nbSounds, verbose = True):
             filename = os.path.join(root, f)
             
             sound, _ = getSound(filename, duration)
-            descriptors[k] = compute_descriptor(sound, J, Q)
+            descriptors[k] = compute_descriptor(sound, descriptorName, J, Q)
     
     if verbose:
         print()
@@ -121,7 +144,9 @@ def compute_descriptors(root, J, Q, duration, nbSounds, verbose = True):
     return np.array(descriptors)
 
 
-def getDescriptors(J = 8, Q = 3, root = './SoundDatabase', verbose = True):
+def getDescriptors(descriptorName = 'scalogramStat1', J = 8, Q = 3, root = './SoundDatabase', verbose = True):
+
+    # TODO : use descriptorName to find the matching array in descriptors.hdf5
 
     persisted_descriptors = h5py.File("./persisted_data/descriptors.hdf5", "a")
 
@@ -135,7 +160,7 @@ def getDescriptors(J = 8, Q = 3, root = './SoundDatabase', verbose = True):
         if verbose:
             print("Creating descriptors matrix and persisting it to a file")
 
-        descriptors = compute_descriptors(root, J, Q, 5, 432, verbose = verbose) 
+        descriptors = compute_descriptors(root, descriptorName, J, Q, 5, 432, verbose = verbose) 
         persisted_descriptors.create_dataset(descriptors_name, data = descriptors)
 
     persisted_descriptors.close()
@@ -145,9 +170,9 @@ def getDescriptors(J = 8, Q = 3, root = './SoundDatabase', verbose = True):
 
 # Psi
 
-def getpsi(J = 8, Q = 3, verbose = True, root = './SoundDatabase', pertinenceFunction = 'identity'):
+def getpsi(descriptorName = 'scalogramStat1', J = 8, Q = 3, verbose = True, root = './SoundDatabase', pertinenceFunction = 'identity'):
 
-    descriptors = getDescriptors(J = J, Q = Q, root = root, verbose = verbose)
+    descriptors = getDescriptors(descriptorName = descriptorName, J = J, Q = Q, root = root, verbose = verbose)
     pertinences = getPertinences(root = root, pertinenceFunction = pertinenceFunction, verbose = verbose)
     
     pertinences = np.tile(pertinences, (descriptors.shape[1], 1)).T
@@ -158,9 +183,9 @@ def getpsi(J = 8, Q = 3, verbose = True, root = './SoundDatabase', pertinenceFun
 
 # Diversité
 
-def compute_diversity(samples, root, J = 8, Q = 3, withPositions = False):
+def compute_diversity(samples, root, descriptorName = 'scalogramStat1', J = 8, Q = 3, withPositions = False):
 
-    psi = getpsi(verbose = False, J = J, Q = Q)
+    psi = getpsi(verbose = False, descriptorName = descriptorName, J = J, Q = Q)
 
     if not(withPositions):
         positions = getPositionsOfFilenames(root, samples)
@@ -173,18 +198,18 @@ def compute_diversity(samples, root, J = 8, Q = 3, withPositions = False):
     return s
 
 
-def diversity_all(root = './SoundDatabase', J = 8, Q = 3, nbSounds = 432):
+def diversity_all(root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, nbSounds = 432):
 
     diversities = np.zeros((nbSounds, nbSounds))
 
     for j in range(nbSounds):
         for i in range(nbSounds):
-            diversities[i, j] = compute_diversity([i, j], root, J = J, Q = Q, withPositions = True)
+            diversities[i, j] = compute_diversity([i, j], root, descriptorName = descriptorName, J = J, Q = Q, withPositions = True)
 
     return diversities
 
 
-def get_all_diversity(root = './SoundDatabase', J = 8, Q = 3, nbSounds = 432, verbose = True):
+def get_all_diversity(root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, nbSounds = 432, verbose = True):
 
     persisted_diversities = h5py.File("./persisted_data/diversities.hdf5", "a")
 
@@ -197,7 +222,7 @@ def get_all_diversity(root = './SoundDatabase', J = 8, Q = 3, nbSounds = 432, ve
     else:
         if verbose:
             print("Creating diversities and persisting it to a file")
-        diversities = diversity_all(root = root, J = J, Q = Q, nbSounds = nbSounds) 
+        diversities = diversity_all(root = root, dsecriptorName = descriptorName, J = J, Q = Q, nbSounds = nbSounds) 
         persisted_diversities.create_dataset(diversities_name, data = diversities)
 
     persisted_diversities.close()
