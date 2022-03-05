@@ -9,7 +9,7 @@ import os
 import h5py
 from scipy import stats
 
-from utils import getPositionsOfFilenames, getSound
+from utils import getPositionsOfFilenames, getSound, progressbar
 
 
 # Pertinence
@@ -74,7 +74,9 @@ def getPertinences(pertinenceFunction = 'identity', root = './SoundDatabase', ve
         persisted_pertinences.create_dataset(pertinences_name, data = pertinences)
 
     persisted_pertinences.close()
+
     pertinences = applyPertinenceFunction(pertinences, pertinenceFunction = pertinenceFunction)
+
     if(windowLenghth != 1):
         pertinences = np.convolve(pertinences,np.ones(windowLenghth)/windowLenghth, 'same')
 
@@ -146,8 +148,6 @@ def compute_descriptors(root, descriptorName, J, Q, duration, nbSounds, verbose 
 
 def getDescriptors(descriptorName = 'scalogramStat1', J = 8, Q = 3, root = './SoundDatabase', verbose = True):
 
-    # TODO : use descriptorName to find the matching array in descriptors.hdf5
-
     persisted_descriptors = h5py.File("./persisted_data/descriptors.hdf5", "a")
 
     descriptors_name = f"{descriptorName}_{J}_{Q}"
@@ -198,11 +198,13 @@ def compute_diversity(samples, root, descriptorName = 'scalogramStat1', J = 8, Q
     return s
 
 
-def diversity_all(root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, nbSounds = 432):
+def diversity_all(root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, nbSounds = 432, verbose = True):
 
     diversities = np.zeros((nbSounds, nbSounds))
 
     for j in range(nbSounds):
+        if verbose:
+            progressbar(nbSounds, j)
         for i in range(nbSounds):
             diversities[i, j] = compute_diversity([i, j], root, descriptorName = descriptorName, J = J, Q = Q, withPositions = True)
 
@@ -213,7 +215,7 @@ def get_all_diversity(root = './SoundDatabase', descriptorName = 'scalogramStat1
 
     persisted_diversities = h5py.File("./persisted_data/diversities.hdf5", "a")
 
-    diversities_name = f"diversities_{J}_{Q}"
+    diversities_name = f"{descriptorName}_{J}_{Q}"
 
     if diversities_name in persisted_diversities:
         if verbose:
@@ -222,7 +224,7 @@ def get_all_diversity(root = './SoundDatabase', descriptorName = 'scalogramStat1
     else:
         if verbose:
             print("Creating diversities and persisting it to a file")
-        diversities = diversity_all(root = root, dsecriptorName = descriptorName, J = J, Q = Q, nbSounds = nbSounds) 
+        diversities = diversity_all(root = root, descriptorName = descriptorName, J = J, Q = Q, nbSounds = nbSounds, verbose = verbose) 
         persisted_diversities.create_dataset(diversities_name, data = diversities)
 
     persisted_diversities.close()
