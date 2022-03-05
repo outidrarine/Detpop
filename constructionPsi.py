@@ -150,7 +150,7 @@ def getDescriptors(descriptorName = 'scalogramStat1', J = 8, Q = 3, root = './So
 
     persisted_descriptors = h5py.File("./persisted_data/descriptors.hdf5", "a")
 
-    descriptors_name = f"descriptors_{J}_{Q}"
+    descriptors_name = f"{descriptorName}_{J}_{Q}"
 
     if descriptors_name in persisted_descriptors:
         if verbose:
