@@ -87,8 +87,10 @@ def getPertinences(pertinenceFunction = 'identity', root = './SoundDatabase', ve
 # Descripteur
 
 def compute_descriptor(sound, descriptorName, J, Q):
+
     
-    if (descriptorName == 'scalogramStat1' or descriptorName == 'scalogramStat4'):
+    
+    if (descriptorName == 'scalogramStat1' or descriptorName == 'scalogramStat2' or descriptorName == 'scalogramStat3' or descriptorName == 'scalogramStat4'):
 
         T = sound.shape[-1]
 
@@ -104,25 +106,36 @@ def compute_descriptor(sound, descriptorName, J, Q):
         if (descriptorName == 'scalogramStat1'):
             return avg
 
-        else:
+        standard_deviation = np.std(scalogram2, axis = 1)
+        standard_deviation = standard_deviation / np.linalg.norm(standard_deviation)
 
-            standard_deviation = np.std(scalogram2, axis = 1)
-            standard_deviation = standard_deviation / np.linalg.norm(standard_deviation)
-            
-            skewness = stats.skew(scalogram2, axis = 1)
-            skewness = skewness / np.linalg.norm(skewness)
+        if (descriptorName == 'scalogramStat2'):
 
-            kurtosis = stats.kurtosis(scalogram2, axis = 1)
-            kurtosis = kurtosis / np.linalg.norm(kurtosis)
-
-
-            descriptor = np.ravel([avg, standard_deviation, skewness, kurtosis])
+            descriptor = np.ravel([avg, standard_deviation])
             descriptor = descriptor / np.linalg.norm(descriptor)
 
             return descriptor
+
+        skewness = stats.skew(scalogram2, axis = 1)
+        skewness = skewness / np.linalg.norm(skewness)
+
+        if (descriptorName == 'scalogramStat3'):
+
+            descriptor = np.ravel([avg, standard_deviation, skewness])
+            descriptor = descriptor / np.linalg.norm(descriptor)
+
+            return descriptor
+
+        kurtosis = stats.kurtosis(scalogram2, axis = 1)
+        kurtosis = kurtosis / np.linalg.norm(kurtosis)
+
+        descriptor = np.ravel([avg, standard_deviation, skewness, kurtosis])
+        descriptor = descriptor / np.linalg.norm(descriptor)
+
+        return descriptor
     
     else:
-        raise ValueError(f"descriptorName: expected 'scalogramStat1' or 'scalogramStat4' but got '{descriptorName}'")
+        raise ValueError(f"descriptorName: expected 'scalogramStat1', 'scalogramStat2', 'scalogramStat3' or 'scalogramStat4' but got '{descriptorName}'")
 
 
 def compute_descriptors(root, descriptorName, J, Q, duration, nbSounds, verbose = True):
