@@ -10,20 +10,20 @@ from utils import get_all_birds
 import os
 from scipy.ndimage import interpolation
 
-from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames
+from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames, getSound
 from constructionPsi import compute_sample_pertinence, compute_diversity, getDescriptors, getPertinences, get_all_diversity
 from echantillonnages import getSamplings
 
 # SPECTROGRAMME
 
-def displaySpectrogram(sound, fs, title, ax):
+def displaySpectrogram(sound, fs, title, ax, xlabel = 'Time [sec]', ylabel = 'Frequency [Hz]', cmap = 'viridis'):
     
     spec, tn, fn, ext = spectrogram(sound, fs)   
     spec_dB = power2dB(spec)
 
-    fig_kwargs = {'vmax': spec_dB.max(),'vmin':-70,'extent':ext,'title':title,'xlabel':'Time [sec]','ylabel':'Frequency [Hz]'}
+    fig_kwargs = {'vmax': spec_dB.max(),'vmin':-70,'extent':ext,'title':title,'xlabel':xlabel,'ylabel':ylabel}
 
-    plot2d(spec_dB,**fig_kwargs, ax = ax, colorbar = False, now = False, cmap='viridis')
+    plot2d(spec_dB,**fig_kwargs, ax = ax, colorbar = False, now = False, cmap = cmap)
 
 
 # REPRESENTATION TEMPORELLE
@@ -536,3 +536,46 @@ def displayEigenvalues(nbEigenvalues = 10, descriptorName = 'scalogramStat1', J 
     plt.hlines(threshold, 0, nbEigenvalues - 1, linestyles = ':')
 
     print(f"Nombres de valeurs propres nécessaires pour expliquer {round(threshold * 100)} % de la variance : {np.min(np.where(sum_eigenvalues > threshold))}")
+
+
+# AFFICHAGE DES SPECTROGRAMMES DES SONS TIRES PAR LES TECHNIQUES D'ECHANTILLONNAGE
+
+def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, height, width, descriptorName, J, Q, pertinenceFunction, root, cmap):
+
+    # Display spectrograms
+
+    nbRows = len(samplingNames)
+    nbCols = nbSamples
+
+    fig, axs = plt.subplots(nrows = nbRows, ncols = nbCols, figsize = (nbCols * width, nbRows * height), sharex = True, sharey = True)
+
+    for i, samplingFunction in enumerate(samplingFunctions):
+
+        samples, _ = samplingFunction(nbSamples, root = root, descriptorName = descriptorName, J = J, Q = Q, pertinenceFunction = pertinenceFunction)
+
+        for j in range(nbCols):
+
+            sound, fs = getSound(os.path.join(root, samples[j]), 5)
+
+            displaySpectrogram(sound, fs, "", axs[i, j], xlabel = "", ylabel = "", cmap = cmap)
+            axs[i, j].set_ylim([0, 10000])
+
+
+    # Titles and labels
+
+    grid = plt.GridSpec(nbRows, nbCols)
+    for k in range(nbRows):
+
+        row = fig.add_subplot(grid[k, ::])
+        row.set_title(samplingNames[k], fontweight='semibold')
+        row.set_frame_on(False)
+        row.axis('off')
+
+    for k in range(nbRows):
+        axs[k, 0].set_ylabel("Fréquences [Hz]")
+
+    for k in range(nbCols):
+        axs[-1, k].set_xlabel("Temps [s]")
+    
+    fig.tight_layout()
+    plt.show()
