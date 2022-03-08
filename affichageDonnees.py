@@ -217,7 +217,7 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
 
 # AFFICHAGE DU GRAPH ORACLE
 
-def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, color_list, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
+def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, c, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
     average_birds = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
     for k, nbSamples in enumerate(nbSamplesList):
         _, _, nbBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, descriptorName, J, Q, pertinenceFunction, bird_search_mode, birdConfidenceLimit = bird_confidence_limit, verbose = True)
@@ -226,11 +226,12 @@ def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_m
     
     total_number_of_birds = len(get_all_birds(root, bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit))
     plt.figure(figsize=(10, 10))
-    for sampling_name in sampling_names:
+    for samplingIndex ,sampling_name in enumerate(sampling_names):
 
-        plt.plot(nbSamplesList ,average_birds[sampling_name])
+        plt.plot(nbSamplesList ,average_birds[sampling_name], color = c[samplingIndex])
 
         plt.xlim(nbSamplesList[0], nbSamplesList[-1])
+        plt.ylim(nbSamplesList[0], total_number_of_birds +2)
 
         plt.xlabel("Number of Samples")
         plt.ylabel("Number of birds")
@@ -241,7 +242,7 @@ def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_m
 
 
     patch = []
-    for k, color in enumerate(color_list):
+    for k, color in enumerate(c):
         patch.append(patches.Patch(color = color, label = sampling_names[k]))
     patch.append(patches.Patch(color = 'red', linewidth = 2, fill = False, linestyle = ':', label = "Oracle"))
     plt.legend(handles = patch)
