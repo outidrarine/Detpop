@@ -24,6 +24,11 @@ def displaySpectrogram(sound, fs, title, ax, xlabel = 'Time [sec]', ylabel = 'Fr
     fig_kwargs = {'vmax': spec_dB.max(),'vmin':-70,'extent':ext,'title':title,'xlabel':xlabel,'ylabel':ylabel}
 
     plot2d(spec_dB,**fig_kwargs, ax = ax, colorbar = False, now = False, cmap = cmap)
+    
+    ax.set_ylim(0, 10000)
+    f = np.abs(fn - 10000)
+    m = np.argmin(f)
+    ax.get_images()[0].set_clim(np.min(spec_dB[0:m, :]), np.max(spec_dB[0:m, :]))
 
 
 # REPRESENTATION TEMPORELLE
@@ -540,7 +545,7 @@ def displayEigenvalues(nbEigenvalues = 10, descriptorName = 'scalogramStat1', J 
 
 # AFFICHAGE DES SPECTROGRAMMES DES SONS TIRES PAR LES TECHNIQUES D'ECHANTILLONNAGE
 
-def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, height, width, descriptorName, J, Q, pertinenceFunction, root, cmap):
+def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, height, width, descriptorName, J, Q, pertinenceFunction, root, cmap, title, labelFontSize, labelFontWeight, subtitlesFontSize, subtitlesFontWeight, titleFontSize, titleFontWeight):
 
     # Display spectrograms
 
@@ -558,24 +563,26 @@ def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, hei
             sound, fs = getSound(os.path.join(root, samples[j]), 5)
 
             displaySpectrogram(sound, fs, "", axs[i, j], xlabel = "", ylabel = "", cmap = cmap)
-            axs[i, j].set_ylim([0, 10000])
+            #axs[i, j].set_ylim([0, 10000])
 
 
     # Titles and labels
+
+    plt.suptitle(title, fontweight = titleFontWeight, fontsize = titleFontSize)
 
     grid = plt.GridSpec(nbRows, nbCols)
     for k in range(nbRows):
 
         row = fig.add_subplot(grid[k, ::])
-        row.set_title(samplingNames[k], fontweight='semibold')
+        row.set_title(samplingNames[k], fontweight = subtitlesFontWeight, fontsize = subtitlesFontSize)
         row.set_frame_on(False)
         row.axis('off')
 
     for k in range(nbRows):
-        axs[k, 0].set_ylabel("Fréquences [Hz]")
+        axs[k, 0].set_ylabel("Fréquences [Hz]", fontweight = labelFontWeight, fontsize = labelFontSize)
 
     for k in range(nbCols):
-        axs[-1, k].set_xlabel("Temps [s]")
+        axs[-1, k].set_xlabel("Temps [s]", fontweight = labelFontWeight, fontsize = labelFontSize)
     
     fig.tight_layout()
     plt.show()
