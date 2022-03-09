@@ -15,6 +15,7 @@ from utils import getFilenamesAtPositions, extract_birds, progressbar
 def sampling_pertinence(nbSamples, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
     q = getPertinences(verbose = False, pertinenceFunction = pertinenceFunction, root = root)
+    q = q**2
 
     nbSounds = len(q)
     

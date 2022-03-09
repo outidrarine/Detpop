@@ -189,7 +189,7 @@ def getpsi(descriptorName = 'scalogramStat1', J = 8, Q = 3, verbose = True, root
     pertinences = getPertinences(root = root, pertinenceFunction = pertinenceFunction, verbose = verbose)
     
     pertinences = np.tile(pertinences, (descriptors.shape[1], 1)).T
-    psi = np.multiply(descriptors, pertinences)
+    psi = np.multiply(descriptors, np.sqrt(pertinences))
 
     return psi
 
