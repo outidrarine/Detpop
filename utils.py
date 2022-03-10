@@ -171,6 +171,27 @@ def extract_birds(samples, root, bird_search_mode = 'single', bird_confidence_li
             
         return set_of_birds
 
+# Calculate number of samples with birds
+def numSamplesWithBirds(samples, root):
+    for root, dirnames, filenames in os.walk(root):
+
+        birds_file_name = np.array(filenames)
+        clip_name = [filename.split('.')[0]+'.wav' for filename in np.array(filenames)]
+        indexes_of_birds_files = [list(clip_name).index(clip) for clip in clip_name if clip in samples]
+        col_list = ['Selection', 'View', 'Channel', 'Begin File', 'Begin Time (s)', 'End Time (s)', 'Low Freq (Hz)', 'High Freq (Hz)',	'Species Code',	'Common Name', 'Confidence', 'Rank']
+        set_of_birds = set()
+
+        nbrSampesWithBirds = 0
+        for index_of_bird_file in indexes_of_birds_files:
+            data = pd.read_csv('./BirdNET/'+birds_file_name[index_of_bird_file], sep="\t",usecols = col_list)
+            data = data.sort_values(by='Confidence', ascending=False)
+            new_birds_array = data[['Species Code','Confidence']]
+
+            if len(new_birds_array) > 0:
+                nbrSampesWithBirds = nbrSampesWithBirds +1
+            
+        return nbrSampesWithBirds
+
 
 # AFFICHAGE D'UNE BARRE DE PROGRESSION
 
