@@ -7,7 +7,7 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 
 from constructionPsi import getDescriptors, getPertinences, getpsi, compute_sample_pertinence, compute_diversity
-from utils import getFilenamesAtPositions, extract_birds, progressbar
+from utils import getFilenamesAtPositions, extract_birds, numSamplesWithBirds, progressbar
 
 
 # Echantillonage par pertinence
@@ -88,8 +88,9 @@ def computeSampling(samplingName, nbSamples, descriptorName, J, Q, pertinenceFun
     diversity = compute_diversity(samples, root, descriptorName = descriptorName, J = J, Q = Q)
 
     nbBirds = len(extract_birds(samples, './BirdNET', bird_confidence_limit = birdConfidenceLimit, bird_search_mode = birdSearchMode))
-    
-    return samplingName, nbSamples, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, averagePertinences, diversity, nbBirds, criterion
+    nbWithBirds = numSamplesWithBirds(samples, './BirdNET', bird_confidence_limit = birdConfidenceLimit, bird_search_mode = birdSearchMode)
+
+    return samplingName, nbSamples, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, averagePertinences, diversity, nbBirds, nbWithBirds, criterion
 
 
 # Extraction de données depuis la dataframe
@@ -124,9 +125,10 @@ def extractSamplings(df, nbSamplings, nbSamples, samplingName, descriptorName, J
     averagePertinenceArray = np.array(dfMatchingRows['averagePertinence'])
     diversityArray = np.array(dfMatchingRows['diversity'])
     nbBirdsArray = np.array(dfMatchingRows['nbBirds'])
+    nbWithBirdsArray = np.array(dfMatchingRows['nbWithBirds'])
     criterionArray = np.array(dfMatchingRows['criterion'])
 
-    return df, averagePertinenceArray, diversityArray, nbBirdsArray, criterionArray
+    return df, averagePertinenceArray, diversityArray, nbBirdsArray, nbWithBirdsArray, criterionArray
 
 
 # Sauvegarde et extraction des echantillonnages
@@ -138,10 +140,11 @@ def getSamplings(nbSamplings, nbSamples, samplingNames, descriptorName, J, Q, pe
     averagePertinenceArrays = np.array(np.zeros(nbSamplings), dtype = [(samplingName, None) for samplingName in samplingNames])
     diversityArrays = np.array(np.zeros(nbSamplings), dtype = [(samplingName, None) for samplingName in samplingNames])
     nbBirdsArrays = np.array(np.zeros(nbSamplings), dtype = [(samplingName, None) for samplingName in samplingNames])
+    nbWithBirdsArrays = np.array(np.zeros(nbSamplings), dtype = [(samplingName, None) for samplingName in samplingNames])
     criterionArrays = np.array(np.zeros(nbSamplings), dtype = [(samplingName, None) for samplingName in samplingNames])
 
     for samplingName in samplingNames:
-        df, averagePertinenceArrays[samplingName], diversityArrays[samplingName], nbBirdsArrays[samplingName], criterionArrays[samplingName] = extractSamplings(df, nbSamplings, nbSamples, samplingName, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, verbose)
+        df, averagePertinenceArrays[samplingName], diversityArrays[samplingName], nbBirdsArrays[samplingName], nbWithBirdsArrays[samplingName], criterionArrays[samplingName] = extractSamplings(df, nbSamplings, nbSamples, samplingName, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, verbose)
 
     df.to_csv('./persisted_data/samplings.csv', index = False)
 
