@@ -172,7 +172,7 @@ def extract_birds(samples, root, bird_search_mode = 'single', bird_confidence_li
         return set_of_birds
 
 # Calculate number of samples with birds
-def numSamplesWithBirds(samples, root):
+def numSamplesWithBirds(samples, root, bird_search_mode = 'single', bird_confidence_limit = 0.1):
     for root, dirnames, filenames in os.walk(root):
 
         birds_file_name = np.array(filenames)
@@ -188,7 +188,15 @@ def numSamplesWithBirds(samples, root):
             new_birds_array = data[['Species Code','Confidence']]
 
             if len(new_birds_array) > 0:
-                nbrSampesWithBirds = nbrSampesWithBirds +1
+                if(bird_search_mode == 'single'):
+                    nbrSampesWithBirds = nbrSampesWithBirds + 1
+                elif(bird_search_mode == 'multi'):
+                    new_birds_array = new_birds_array[new_birds_array['Confidence'] > bird_confidence_limit]
+                    if(len(new_birds_array) > 0):
+                        nbrSampesWithBirds = nbrSampesWithBirds + 1
+                else:
+                    raise ValueError('mode can only be "single" or "multi"')
+                set(new_birds_array)
             
         return nbrSampesWithBirds
 
