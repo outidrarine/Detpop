@@ -206,7 +206,7 @@ def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identit
 def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity', birdSearchMode = 'single', birdConfidenceLimit = 0.1, pareto = True, bestOfN_step = 20):
 
     # Calculs des échantillonages
-    average_pertinences, diversities, average_birds, criteria = getSamplings(nbSamplings, nbSamples, samplingNames, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit)
+    average_pertinences, diversities, average_birds, _, criteria = getSamplings(nbSamplings, nbSamples, samplingNames, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit)
     
     # Affichages des valeurs moyennes
     displaySamplingsAverages(samplingNames, average_pertinences, diversities, average_birds)
@@ -215,7 +215,7 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
     displaySamplingsHistograms(samplingNames, average_pertinences, diversities)
 
     # Affichage des nuages de points des échantillonnages
-    displaySamplingClouds(samplingNames, nbSamplings, average_pertinences, diversities, color_list, pareto = pareto)
+    displayClouds(samplingNames, nbSamplings, average_pertinences, diversities, color_list, displayPareto = pareto)
 
     # Affichage des best of N
     displayBestOfN(samplingNames, average_pertinences, diversities, criteria, bestOfN_step, nbSamplings, color_list)
@@ -228,7 +228,7 @@ def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_m
     nbWithBirdsArrays = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
     
     for k, nbSamples in enumerate(nbSamplesList):
-        _, _, nbBirdsArrays,nbWithBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, descriptorName, J, Q, pertinenceFunction, bird_search_mode, birdConfidenceLimit = bird_confidence_limit, verbose = True)
+        _, _, nbBirdsArrays, nbWithBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, descriptorName, J, Q, pertinenceFunction, bird_search_mode, birdConfidenceLimit = bird_confidence_limit, verbose = True)
         for sampling_name in sampling_names:
             average_birds[sampling_name][k] = np.mean(nbBirdsArrays[sampling_name])
     
@@ -313,25 +313,27 @@ def displaySamplingsHistograms(samplingNames, average_pertinences, diversities):
 
 # REPRÉSENTATION DIVERSITÉ/PERTINENCE DES ÉCHANTILLONNAGES
 
-def displaySamplingClouds(samplingNames, nbSamplings, average_pertinences, diversities, color_list, pareto = True):
+def displayClouds(samplingNames, nbSamplings, average_pertinences, diversities, color_list, displayPareto = True, title = "Samplings repartition in the pertinence/diversity plan", xLabel = "Pertinence", yLabel = "Diversité", figSize = (10, 10), labelFontSize = 10, labelFontWeight = 'normal', titleFontSize = 12, titleFontWeight = 'normal', legendNames = None):
 
-    plt.figure(figsize=(10, 10))
+    plt.figure(figsize = figSize)
 
     alpha = 200 / nbSamplings
 
     for k, sampling_name in enumerate(samplingNames):
         plt.scatter(average_pertinences[sampling_name], diversities[sampling_name], alpha = alpha, color = color_list[k])
 
-    plt.xlabel("Pertinence")
-    plt.ylabel("Diversité")
+    plt.xlabel(xLabel, fontsize = labelFontSize, fontweight = labelFontWeight)
+    plt.ylabel(yLabel, fontsize = labelFontSize, fontweight = labelFontWeight)
     
-    legend = plt.legend(samplingNames)
+    if legendNames is None:
+        legendNames = samplingNames
+    legend = plt.legend(legendNames)
     for l in legend.legendHandles:
         l.set_alpha(1)
 
-    plt.title("Samplings repartition in the pertinence/diversity plan")
+    plt.title(title, fontsize = titleFontSize, fontweight = titleFontWeight)
 
-    if pareto:
+    if displayPareto:
 
         areaUnderParetoFront = {}
         for k, sampling_name in enumerate(samplingNames):
@@ -366,6 +368,12 @@ def displaySamplingClouds(samplingNames, nbSamplings, average_pertinences, diver
 
     else:
         plt.show()
+
+    
+def displaySamplingClouds(samplingNames, nbSamples, nbSamplings, color_list, descriptorName, J, Q, pertinenceFunction, displayPareto, title, xLabel, yLabel, figSize, labelFontSize, labelFontWeight, titleFontSize, titleFontWeight, legendNames):
+
+    average_pertinences, diversities, _, _, _ = getSamplings(nbSamplings, nbSamples, samplingNames, descriptorName, J, Q, pertinenceFunction, 'single', 0.1)
+    displayClouds(samplingNames, nbSamplings, average_pertinences, diversities, color_list, displayPareto, title = title, xLabel = xLabel, yLabel = yLabel, figSize = figSize, labelFontSize = labelFontSize, labelFontWeight = labelFontWeight, titleFontSize = titleFontSize, titleFontWeight = titleFontWeight, legendNames = legendNames)
 
 
 # RECHERCHE DES POINTS DU FRONT DE PARETO
@@ -448,7 +456,9 @@ def computeBestOfN(samplingNames, average_pertinences, average_diversities, crit
     
     return bestOfN
 
+
 # Display birds over time
+
 def displayBirdsOverTime(root, bird_search_mode, bird_confidence_limit, numberOfHours = 1, withPertinenceCurve = True, displayBirdsGraphToo = True, windowLenghthForPertinence = 5):
     
     for root, dirnames, filenames in os.walk(root):
@@ -509,7 +519,9 @@ def displayBirdsOverTime(root, bird_search_mode, bird_confidence_limit, numberOf
         ax2.tick_params(axis='y', labelcolor=color)
         ax2.set_ylabel('Pertinence', color=color)
 
-# Display a historam with pertinences and number of birds
+
+# Display a histogram with pertinences and number of birds
+
 def showPertinenceWithBirdsNumberHistogram(root ,bird_search_mode, bird_confidence_limit, windowLenghthForPertinence):
     for root, dirnames, filenames in os.walk(root):
         q = getPertinences(verbose = False, pertinenceFunction = 'identity', windowLenghth = windowLenghthForPertinence)
@@ -590,6 +602,7 @@ def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, hei
     fig.tight_layout()
     plt.show()
 
+
 # Show oracle curve for number of birds in samples & number of samples with birds in 
 
 def displayDoubleOracle(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, c, dispParams, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
@@ -623,7 +636,7 @@ def displayDoubleOracle(sampling_names, nbSamplesList, nbSamplings, bird_search_
     patch = []
     for k, color in enumerate(c):
         patch.append(Line2D([0], [0], color=color, lw=2, label = sampling_names[k]))
-    patch.append(Line2D([0], [0], color='red', lw=2, linestyle = ':', label = 'Oracle'))
+    patch.append(Line2D([0], [0], color='red', lw=2, linestyle = ':', label = 'Maximum théorique'))
     ax1.legend(handles = patch)
     ax1.set_title(dispParams['title1'], {'fontsize':dispParams['titleFontSize'], 'fontweight':dispParams['titleFontWeight']})
 
@@ -644,3 +657,5 @@ def displayDoubleOracle(sampling_names, nbSamplesList, nbSamplings, bird_search_
     ax2.plot(np.linspace(nbSamplesList[0], nbSamplesList[-1], nbSamplesList[-1] - nbSamplesList[0] +1), np.linspace(nbSamplesList[0], nbSamplesList[-1], nbSamplesList[-1] - nbSamplesList[0] +1) , color = 'r', linestyle = ':')
 
     ax2.legend(handles = patch)
+
+    plt.show()
