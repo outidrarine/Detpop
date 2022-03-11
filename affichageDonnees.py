@@ -3,6 +3,7 @@
 from reprlib import aRepr
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.lines import Line2D
 from matplotlib import patches
 from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
@@ -224,8 +225,10 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
 
 def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, c, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
     average_birds = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+    nbWithBirdsArrays = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+    
     for k, nbSamples in enumerate(nbSamplesList):
-        _, _, nbBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, descriptorName, J, Q, pertinenceFunction, bird_search_mode, birdConfidenceLimit = bird_confidence_limit, verbose = True)
+        _, _, nbBirdsArrays,nbWithBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, descriptorName, J, Q, pertinenceFunction, bird_search_mode, birdConfidenceLimit = bird_confidence_limit, verbose = True)
         for sampling_name in sampling_names:
             average_birds[sampling_name][k] = np.mean(nbBirdsArrays[sampling_name])
     
@@ -586,3 +589,58 @@ def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, hei
     
     fig.tight_layout()
     plt.show()
+
+# Show oracle curve for number of birds in samples & number of samples with birds in 
+
+def displayDoubleOracle(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, c, dispParams, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
+    average_birds = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+    average_nbWithBirdsArrays = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+    
+    for k, nbSamples in enumerate(nbSamplesList):
+        _, _, nbBirdsArrays,nbWithBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, descriptorName, J, Q, pertinenceFunction, bird_search_mode, birdConfidenceLimit = bird_confidence_limit, verbose = True)
+        for sampling_name in sampling_names:
+            average_birds[sampling_name][k] = np.mean(nbBirdsArrays[sampling_name])
+            average_nbWithBirdsArrays[sampling_name][k] = np.mean(nbWithBirdsArrays[sampling_name])
+
+    
+    total_number_of_birds = len(get_all_birds(root, bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=dispParams['figureSize'])
+    for samplingIndex ,sampling_name in enumerate(sampling_names):
+
+        ax1.plot(nbSamplesList ,average_birds[sampling_name], color = c[samplingIndex])
+
+        ax1.set_xlim(0, nbSamplesList[-1])
+        ax1.set_ylim(0, total_number_of_birds +2)
+
+        ax1.set_xlabel(dispParams['x1label'], fontsize = dispParams['labelFontSize'], fontweight = dispParams['labelFontWeight'])
+        ax1.set_ylabel(dispParams['y1label'], fontsize = dispParams['labelFontSize'], fontweight = dispParams['labelFontWeight'])
+
+    endOfGraph = np.minimum(nbSamplesList[-1], total_number_of_birds)
+    # Affchage de la courbe de l'oracle
+    ax1.plot(np.linspace(nbSamplesList[0], nbSamplesList[-1], nbSamplesList[-1] - nbSamplesList[0] +1), np.concatenate([np.linspace(nbSamplesList[0], endOfGraph, endOfGraph - nbSamplesList[0] +1) , [total_number_of_birds]*(np.maximum(0 , nbSamplesList[-1] - total_number_of_birds))]), color = 'r', linestyle = ':')
+
+
+    patch = []
+    for k, color in enumerate(c):
+        patch.append(Line2D([0], [0], color=color, lw=2, label = sampling_names[k]))
+    patch.append(Line2D([0], [0], color='red', lw=2, linestyle = ':', label = 'Oracle'))
+    ax1.legend(handles = patch)
+    ax1.set_title(dispParams['title1'], {'fontsize':dispParams['titleFontSize'], 'fontweight':dispParams['titleFontWeight']})
+
+    plt.figure(figsize=(10, 5))
+    ax2.set_title(dispParams['title2'], {'fontsize':dispParams['titleFontSize'], 'fontweight':dispParams['titleFontWeight']})
+
+    for samplingIndex ,sampling_name in enumerate(sampling_names):
+
+        ax2.plot(nbSamplesList ,average_nbWithBirdsArrays[sampling_name], color = c[samplingIndex])
+
+        ax2.set_xlim(0, nbSamplesList[-1])
+        ax2.set_ylim(0, np.amax(nbSamplesList))
+
+        ax2.set_xlabel(dispParams['x2label'], fontsize = dispParams['labelFontSize'], fontweight = dispParams['labelFontWeight'])
+        ax2.set_ylabel(dispParams['y2label'], fontsize = dispParams['labelFontSize'], fontweight = dispParams['labelFontWeight'])
+    
+    # Affchage de la courbe de l'oracle
+    ax2.plot(np.linspace(nbSamplesList[0], nbSamplesList[-1], nbSamplesList[-1] - nbSamplesList[0] +1), np.linspace(nbSamplesList[0], nbSamplesList[-1], nbSamplesList[-1] - nbSamplesList[0] +1) , color = 'r', linestyle = ':')
+
+    ax2.legend(handles = patch)

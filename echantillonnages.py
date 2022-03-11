@@ -148,4 +148,4 @@ def getSamplings(nbSamplings, nbSamples, samplingNames, descriptorName, J, Q, pe
 
     df.to_csv('./persisted_data/samplings.csv', index = False)
 
-    return averagePertinenceArrays, diversityArrays, nbBirdsArrays, criterionArrays
+    return averagePertinenceArrays, diversityArrays, nbBirdsArrays, nbWithBirdsArrays, criterionArrays
