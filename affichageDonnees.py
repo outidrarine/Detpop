@@ -17,12 +17,12 @@ from echantillonnages import getSamplings
 
 # SPECTROGRAMME
 
-def displaySpectrogram(sound, fs, title, ax, xlabel = 'Time [sec]', ylabel = 'Frequency [Hz]', cmap = 'viridis'):
+def displaySpectrogram(sound, fs, title, ax, xlabel = 'Time [sec]', ylabel = 'Frequency [kHz]', cmap = 'viridis'):
     
     spec, tn, fn, ext = spectrogram(sound, fs)   
     spec_dB = power2dB(spec)
 
-    fig_kwargs = {'vmax': spec_dB.max(),'vmin':-70,'extent':ext,'title':title,'xlabel':xlabel,'ylabel':ylabel}
+    fig_kwargs = {'vmax': spec_dB.max(), 'vmin':-70, 'extent':ext, 'title':title, 'xlabel':xlabel, 'ylabel':ylabel}
 
     plot2d(spec_dB,**fig_kwargs, ax = ax, colorbar = False, now = False, cmap = cmap)
     
@@ -30,6 +30,11 @@ def displaySpectrogram(sound, fs, title, ax, xlabel = 'Time [sec]', ylabel = 'Fr
     f = np.abs(fn - 10000)
     m = np.argmin(f)
     ax.get_images()[0].set_clim(np.min(spec_dB[0:m, :]), np.max(spec_dB[0:m, :]))
+    ax.set_yticks(ax.get_yticks())
+    ax.set_yticklabels([int(label) for label in ax.get_yticks()/1000])
+    xticks = np.linspace(ext[0], ext[1], 6)
+    ax.set_xticks(xticks)
+    ax.set_xticklabels([round(label) for label in xticks])
 
 
 # REPRESENTATION TEMPORELLE
@@ -578,7 +583,6 @@ def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, hei
             sound, fs = getSound(os.path.join(root, samples[j]), 5)
 
             displaySpectrogram(sound, fs, "", axs[i, j], xlabel = "", ylabel = "", cmap = cmap)
-            #axs[i, j].set_ylim([0, 10000])
 
 
     # Titles and labels
@@ -594,7 +598,7 @@ def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, hei
         row.axis('off')
 
     for k in range(nbRows):
-        axs[k, 0].set_ylabel("Fréquences [Hz]", fontweight = labelFontWeight, fontsize = labelFontSize)
+        axs[k, 0].set_ylabel("Fréquences [kHz]", fontweight = labelFontWeight, fontsize = labelFontSize)
 
     for k in range(nbCols):
         axs[-1, k].set_xlabel("Temps [s]", fontweight = labelFontWeight, fontsize = labelFontSize)
