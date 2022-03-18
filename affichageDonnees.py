@@ -332,7 +332,7 @@ def displayClouds(samplingNames, nbSamplings, average_pertinences, diversities, 
     
     if legendNames is None:
         legendNames = samplingNames
-    legend = plt.legend(legendNames)
+    legend = plt.legend(legendNames, fontsize = labelFontSize)
     for l in legend.legendHandles:
         l.set_alpha(1)
 

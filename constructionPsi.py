@@ -4,7 +4,8 @@ from kymatio.numpy import Scattering1D
 from matplotlib import pyplot as plt
 import numpy as np
 from maad.features import tfsd
-from maad.sound import spectrogram
+from maad.sound import spectrogram, linear_to_octave
+from maad.util import index_bw
 import os
 import h5py
 from scipy import stats
@@ -27,8 +28,21 @@ def applyPertinenceFunction(q, pertinenceFunction = 'identity'):
 
 
 def compute_pertinence(sound, fe):
-    Spec, tn, fn, _ = spectrogram(sound, fe)
-    q = tfsd(Spec, fn, tn)
+
+    #sound = sound/np.max(np.abs(sound))
+    Sxx, _, fn, _ = spectrogram(sound, fe)
+
+    # Compute the numerator of the TFSD (copied from maad.features.tfsd)
+    x, fn_bin = linear_to_octave(Sxx, fn, thirdOctave = True)
+    GRADdt = np.diff(x, n=1, axis=1)
+    GRADdf = np.diff(GRADdt, n=1, axis=0)
+    flim = (2000, 8000)
+    GRADdf_2000_8000 = GRADdf[index_bw(fn_bin[0:-1], bw = flim),]
+    GRADdf_0_2000 = GRADdf[index_bw(fn_bin[0:-1], bw = (0, 2000)),]
+    GRADdf_8000_10000 = GRADdf[index_bw(fn_bin[0:-1], bw = (8000, 10000)),]
+    #q = np.sum(np.abs(GRADdf_2000_8000)) / (np.sum(np.abs(GRADdf_0_2000)) + np.sum(np.abs(GRADdf_8000_10000)))
+    q = np.sum(np.abs(GRADdf_2000_8000)) / np.sum(np.abs(GRADdf))
+
     return q
 
 
@@ -41,6 +55,10 @@ def compute_all_pertinence(root, duration = 5, nbSounds = 432):
             filename = os.path.join(root, f)
             sound, fe = getSound(filename, duration)
             q[k] = compute_pertinence(sound, fe)
+
+    # qmin = np.min(q)
+    # qmax = np.max(q)
+    #q = (q - qmin) / (qmax - qmin)
 
     return q
 
