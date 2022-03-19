@@ -655,43 +655,27 @@ def displayDoubleOracle(sampling_names, nbSamplesList, nbSamplings, bird_search_
             average_birds[sampling_name][k] = np.mean(nbBirdsArrays[sampling_name])
             average_nbWithBirdsArrays[sampling_name][k] = np.mean(nbWithBirdsArrays[sampling_name])
 
+    _, (ax1, ax2) = plt.subplots(2, 1, figsize=dispParams['figureSize'])
     
-    total_number_of_birds = len(get_all_birds(root, bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit))
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=dispParams['figureSize'])
     for samplingIndex ,sampling_name in enumerate(sampling_names):
 
         ax1.semilogx(nbSamplesList, average_birds[sampling_name]/nbSamplesList, color = c[samplingIndex])
 
-        #ax1.set_xlim(0, nbSamplesList[-1])
-        #ax1.set_ylim(0, total_number_of_birds + 2)
-
         ax1.set_xlabel(dispParams['x1label'], fontsize = dispParams['labelFontSize'], fontweight = dispParams['labelFontWeight'])
         ax1.set_ylabel(dispParams['y1label'], fontsize = dispParams['labelFontSize'], fontweight = dispParams['labelFontWeight'])
 
-
-    # Affichage de la courbe de l'oracle
-    endOfGraph = np.minimum(nbSamplesList[-1], total_number_of_birds)
-    #ax1.semilogx(np.linspace(nbSamplesList[0], nbSamplesList[-1], nbSamplesList[-1] - nbSamplesList[0] +1), np.concatenate([np.linspace(nbSamplesList[0], endOfGraph, endOfGraph - nbSamplesList[0] +1) , [total_number_of_birds]*(np.maximum(0 , nbSamplesList[-1] - total_number_of_birds))]), color = 'r', linestyle = ':')
-
-    ax1.legend(dispParams['legend'])
+    ax1.legend(dispParams['legend'], fontsize = dispParams['legendFontSize'])
     ax1.set_title(dispParams['title1'], {'fontsize':dispParams['titleFontSize'], 'fontweight':dispParams['titleFontWeight']})
-
-    plt.figure(figsize=(10, 5))
-    ax2.set_title(dispParams['title2'], {'fontsize':dispParams['titleFontSize'], 'fontweight':dispParams['titleFontWeight']})
 
     for samplingIndex ,sampling_name in enumerate(sampling_names):
 
         ax2.semilogx(nbSamplesList ,average_nbWithBirdsArrays[sampling_name]/nbSamplesList, color = c[samplingIndex])
 
-        #ax2.set_xlim(0, nbSamplesList[-1])
-        #ax2.set_ylim(0, np.amax(nbSamplesList))
-
         ax2.set_xlabel(dispParams['x2label'], fontsize = dispParams['labelFontSize'], fontweight = dispParams['labelFontWeight'])
         ax2.set_ylabel(dispParams['y2label'], fontsize = dispParams['labelFontSize'], fontweight = dispParams['labelFontWeight'])
     
-    # Affichage de la courbe de l'oracle
-    #ax2.semilogx(np.linspace(nbSamplesList[0], nbSamplesList[-1], nbSamplesList[-1] - nbSamplesList[0] +1), np.linspace(nbSamplesList[0], nbSamplesList[-1], nbSamplesList[-1] - nbSamplesList[0] +1) , color = 'r', linestyle = ':')
-
-    ax2.legend(dispParams['legend'])
-
+    ax2.legend(dispParams['legend'], fontsize = dispParams['legendFontSize'])
+    ax2.set_title(dispParams['title2'], {'fontsize':dispParams['titleFontSize'], 'fontweight':dispParams['titleFontWeight']})
+    
+    plt.subplots_adjust(hspace = dispParams['hspace'])
     plt.show()
