@@ -12,7 +12,7 @@ import os
 from scipy.ndimage import interpolation
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames, getSound
-from constructionPsi import compute_sample_pertinence, compute_diversity, getDescriptors, getPertinences, get_all_diversity
+from constructionPsi import compute_sample_pertinence, compute_diversity, getDescriptors, getPertinences, get_all_diversity, getpsi
 from echantillonnages import getSamplings
 
 # SPECTROGRAMME
@@ -158,6 +158,42 @@ def displayDiversities(samples = [], root = './SoundDatabase', descriptorName = 
     # Affichage de la colorbar
 
     cax = plt.axes([0.95, 0.05, 0.05, 0.9])
+    plt.colorbar(mappable = im, cax = cax)
+
+    # TRACÉ DE likelyhood
+
+def displayLikelyhoodKernel(dispParams, samples = [], root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
+
+    psi = getpsi(J = 12, Q = 3)
+    L = np.dot(psi,psi.T)
+
+    nbSounds = L.shape[0]
+
+    # Affichage de la matrice des diversités
+
+    plt.figure(figsize=dispParams['figureSize'])
+
+    ax = plt.axes([0, 0.05, 0.9, 0.9])
+    ax.grid(False)
+    ax.set_title(dispParams['title'], fontsize = dispParams['titleFontSize'])
+
+    im = ax.imshow((L - np.min(L))/(np.max(L) - np.min(L)), cmap = 'viridis')
+
+    # Affichages de points sur l'image
+
+    scatter_over_diversity(root, samples)
+
+    # Afficages des labels sur les axes
+
+    dates = dispParams['labels']
+    dates2 = dispParams['labels2']
+    plt.xticks([nbSounds/6 * k for k in range(7)], labels = dates2, fontsize = dispParams['labelsFontSize'])
+    plt.yticks([nbSounds/6 * k for k in range(7)], labels = dates, fontsize = dispParams['labelsFontSize'])
+
+    # Affichage de la colorbar
+
+    cax = plt.axes([0.95, 0.05, 0.05, 0.9])
+    cax.tick_params(labelsize = dispParams['labelsFontSize'])
     plt.colorbar(mappable = im, cax = cax)
 
 
@@ -622,7 +658,6 @@ def displayDoubleOracle(sampling_names, nbSamplesList, nbSamplings, bird_search_
     
     total_number_of_birds = len(get_all_birds(root, bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit))
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=dispParams['figureSize'])
-    
     for samplingIndex ,sampling_name in enumerate(sampling_names):
 
         ax1.semilogx(nbSamplesList, average_birds[sampling_name]/nbSamplesList, color = c[samplingIndex])
