@@ -3,7 +3,6 @@
 from reprlib import aRepr
 import numpy as np
 from matplotlib import pyplot as plt
-from matplotlib.lines import Line2D
 from matplotlib import patches
 from maad.sound import spectrogram
 from maad.util import plot2d, power2dB
@@ -19,7 +18,7 @@ from echantillonnages import getSamplings
 
 def displaySpectrogram(sound, fs, title, ax, xlabel = 'Time [sec]', ylabel = 'Frequency [kHz]', cmap = 'viridis'):
     
-    spec, tn, fn, ext = spectrogram(sound, fs)   
+    spec, _, fn, ext = spectrogram(sound, fs)   
     spec_dB = power2dB(spec)
 
     fig_kwargs = {'vmax': spec_dB.max(), 'vmin':-70, 'extent':ext, 'title':title, 'xlabel':xlabel, 'ylabel':ylabel}
@@ -69,7 +68,7 @@ def displayPolarSamples(samples):
 
         samplesPerDay[day].append(time)
     
-    fig = plt.figure(figsize =(6, 6))
+    plt.figure(figsize =(6, 6))
 
     colors = ['r', 'g', 'b']
     ax = plt.subplot(111, projection='polar')
