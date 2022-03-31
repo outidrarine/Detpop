@@ -51,9 +51,9 @@ def sampling_random(nbSamples, root = './SoundDatabase', descriptorName = 'scalo
     return samples, 0
 
 
-# Echantillonage par K-Means
+# Echantillonage par K-Means pondéré
 
-def sampling_kmeans(nbSamples, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
+def sampling_weighted_kmeans(nbSamples, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
     descriptor = getDescriptors(verbose = False, descriptorName = descriptorName, J = J, Q = Q)
     pertinence = getPertinences(pertinenceFunction = pertinenceFunction, root = root, verbose = False)
@@ -65,6 +65,23 @@ def sampling_kmeans(nbSamples, root = './SoundDatabase', descriptorName = 'scalo
     samples = getFilenamesAtPositions(root, samples_positions)
 
     criterion = kmeans.score(descriptor, pertinence)
+
+    return samples, criterion
+
+
+# Echantillonnage par K-means standard
+
+def sampling_kmeans(nbSamples, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
+
+    descriptor = getDescriptors(verbose = False, descriptorName = descriptorName, J = J, Q = Q)
+
+    kmeans = KMeans(n_clusters = nbSamples, init = 'random', n_init = 1).fit(descriptor)
+
+    samples_positions, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, descriptor)
+
+    samples = getFilenamesAtPositions(root, samples_positions)
+
+    criterion = kmeans.score(descriptor)
 
     return samples, criterion
 
@@ -90,7 +107,7 @@ def sampling_dpp(nbSamples, root = './SoundDatabase', descriptorName = 'scalogra
 
 def computeSampling(samplingName, nbSamples, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, root = './SoundDatabase'):
 
-    samplings = {'Random': sampling_random, 'Pertinence': sampling_pertinence, 'K-means': sampling_kmeans, 'K-DPP': sampling_dpp, 'MaxPertinence': sampling_max_pertinence}
+    samplings = {'Random': sampling_random, 'Pertinence': sampling_pertinence, 'WeightedK-means': sampling_weighted_kmeans, 'K-means': sampling_kmeans, 'K-DPP': sampling_dpp, 'MaxPertinence': sampling_max_pertinence}
     sampling = samplings[samplingName]
 
     samples, criterion = sampling(nbSamples, root = root, descriptorName = descriptorName, J = J, Q = Q, pertinenceFunction = pertinenceFunction)
