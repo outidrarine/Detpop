@@ -1,6 +1,5 @@
 # LIBRAIRIES
 
-from reprlib import aRepr
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import patches
@@ -11,7 +10,7 @@ import os
 from scipy.ndimage import interpolation
 
 from utils import getDateFromFilename, extract_birds, getPositionsOfFilenames, getSound
-from constructionPsi import compute_sample_pertinence, compute_diversity, getDescriptors, getPertinences, get_all_diversity, getpsi
+from constructionPsi import compute_sample_pertinence, compute_diversity, getDescriptors, getPertinences, getpsi
 from echantillonnages import getSamplings
 
 # SPECTROGRAMME
@@ -52,7 +51,6 @@ def displaySound(sound, fs, duration, title, ax):
 # REPRÉSENTATION POLAIRE D'UN ÉCHANTILLONNAGE DE SONS
 
 def displayPolarSamples(samples):
-    nbSamples = len(samples)
 
     samplesPerDay = {}
 
@@ -92,7 +90,7 @@ def displayPolarSamples(samples):
 
 # TRACÉ DE LA PERTINENCE
 
-def displayPertinences(pertinenceFunction = 'identity', samples = [], root = './SoundDatabase', windowLenghth = 1):
+def displayPertinences(pertinenceFunction = 'identity', samples = [], soundsRoot = './data/sounds', windowLenghth = 1):
 
     q = getPertinences(verbose = False, pertinenceFunction = pertinenceFunction, windowLenghth = windowLenghth)
 
@@ -115,23 +113,23 @@ def displayPertinences(pertinenceFunction = 'identity', samples = [], root = './
 
     # Affichages de points sur la courbe
 
-    scatter_over_pertinence(q, root, samples)
+    scatter_over_pertinence(q, soundsRoot, samples)
 
 
 # INDIQUE LES ÉCHANTILLONS SELECTIONNÉS PAR UN ÉCHANTILLONAGE DANS LA COURBE DES PERTINENCES
 
-def scatter_over_pertinence(q, root, samples=[]):
+def scatter_over_pertinence(q, soundsRoot, samples=[]):
 
-    places = getPositionsOfFilenames(root, samples)
+    places = getPositionsOfFilenames(soundsRoot, samples)
     plt.scatter(places, q[places], 50, marker='x', color = 'r')
 
 
 # TRACÉ DE LA MATRICE DES DIVERSITES
+  
+def displayDiversities(samples = [], soundsRoot = './data/sounds', descriptorName = 'scalogramStat1', J = 8, Q = 3):
 
-def displayDiversities(samples = [], root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
-
-    diversities = get_all_diversity(root = root, descriptorName = descriptorName, J = J, Q = Q, verbose = False)
-
+    descriptors = getDescriptors(descriptorName, J, Q, soundsRoot = soundsRoot, verbose = False)
+    diversities = 1 - descriptors.dot(descriptors.T)
     nbSounds = diversities.shape[0]
 
     # Affichage de la matrice des diversités
@@ -146,7 +144,7 @@ def displayDiversities(samples = [], root = './SoundDatabase', descriptorName = 
 
     # Affichages de points sur l'image
 
-    scatter_over_diversity(root, samples)
+    scatter_over_diversity(soundsRoot, samples)
 
     # Afficages des labels sur les axes
 
@@ -161,9 +159,9 @@ def displayDiversities(samples = [], root = './SoundDatabase', descriptorName = 
 
     # TRACÉ DE likelyhood
 
-def displayLikelyhoodKernel(dispParams, samples = [], root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
+def displayLikelyhoodKernel(dispParams, samples = [], soundsRoot = './data/sounds', descriptorName = 'scalogramStat1', J = 8, Q = 3):
 
-    psi = getpsi(J = 12, Q = 3)
+    psi = getpsi(J = J, Q = Q, descriptorName = descriptorName)
     L = np.dot(psi,psi.T)
 
     nbSounds = L.shape[0]
@@ -180,7 +178,7 @@ def displayLikelyhoodKernel(dispParams, samples = [], root = './SoundDatabase', 
 
     # Affichages de points sur l'image
 
-    scatter_over_diversity(root, samples)
+    scatter_over_diversity(soundsRoot, samples)
 
     # Afficages des labels sur les axes
 
@@ -198,21 +196,20 @@ def displayLikelyhoodKernel(dispParams, samples = [], root = './SoundDatabase', 
 
 # INDIQUE LES ÉCHANTILLONS SELECTIONNÉS PAR UN ÉCHANTILLONAGE DANS LA MATRICE DES DIVERSITES
 
-def scatter_over_diversity(root, samples=[]):
+def scatter_over_diversity(soundsRoot, samples=[]):
     
-    places = getPositionsOfFilenames(root, samples)
+    places = getPositionsOfFilenames(soundsRoot, samples)
     plt.scatter(places, places, 200, marker='x', color = 'r')
 
 
 # AFFICHAGES D'INFORMATIONS SUR UN ECHANTILLONAGE
 
-def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identity', descriptorName = 'scalogramStat1', J = 8, Q = 3, bird_search_mode = 'single', bird_confidence_limit = 0.1):
+def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identity', descriptorName = 'scalogramStat1', J = 8, Q = 3, bird_search_mode = 'single', bird_confidence_limit = 0.1, soundsRoot = './data/sounds', birdRoot = './data/birdNet'):
 
     # Initialisation et calculs
-    root = './SoundDatabase'
     samples, _ = sampling_function(nbSamples, descriptorName = descriptorName, J = J, Q = Q)
 
-    pertinences = compute_sample_pertinence(samples, root = root, pertinenceFunction = pertinenceFunction)
+    pertinences = compute_sample_pertinence(samples, soundsRoot = soundsRoot, pertinenceFunction = pertinenceFunction)
 
     # Affichage des textes
     print()
@@ -223,27 +220,27 @@ def present_sampling(sampling_function, nbSamples, pertinenceFunction = 'identit
     print("Average pertinence:", np.mean(pertinences))
     print()
 
-    print("diversity:", compute_diversity(samples, root, descriptorName = descriptorName, J = J, Q = Q))
+    print("diversity:", compute_diversity(samples, soundsRoot, descriptorName = descriptorName, J = J, Q = Q))
     print()
 
     # Affichages sur figure polaire
     displayPolarSamples(samples)
 
     # Affichage sur figure pertinences
-    displayPertinences(pertinenceFunction = pertinenceFunction, samples = samples, root = root)
+    displayPertinences(pertinenceFunction = pertinenceFunction, samples = samples, soundsRoot = soundsRoot)
 
     # Affichage sur figure diversités
     displayDiversities(samples, descriptorName = descriptorName, J = J, Q = Q)
 
     # Extraction des oiseaux 
-    birds_set = extract_birds(samples, './BirdNET', bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)
+    birds_set = extract_birds(samples, birdRoot = birdRoot, bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)
     print('Extraction of birds from those samples :',len(birds_set))
     print(birds_set)
 
 
 # COMPARAISON D'ÉCHANTILLONAGES
 
-def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity', birdSearchMode = 'single', birdConfidenceLimit = 0.1, pareto = True, bestOfN_step = 20):
+def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, soundsRoot = './data/sounds', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity', birdSearchMode = 'single', birdConfidenceLimit = 0.1, pareto = True, bestOfN_step = 20):
 
     # Calculs des échantillonages
     average_pertinences, diversities, average_birds, _, criteria = getSamplings(nbSamplings, nbSamples, samplingNames, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit)
@@ -263,18 +260,18 @@ def compare_sampling(samplingNames, nbSamples, nbSamplings, color_list, root = '
 
 # AFFICHAGE DU GRAPH ORACLE
 
-def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, c, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
-    average_birds = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
-    nbWithBirdsArrays = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, c, birdRoot = './data/birdNet', descriptorName = 'scalogramStat1', J = 8, Q = 3):
     
+    average_birds = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
+
     for k, nbSamples in enumerate(nbSamplesList):
-        _, _, nbBirdsArrays, nbWithBirdsArrays, _ = getSamplings(nbSamplings, nbSamples, sampling_names, descriptorName, J, Q, pertinenceFunction, bird_search_mode, birdConfidenceLimit = bird_confidence_limit, verbose = True)
+        _, _, nbBirdsArrays, _, _ = getSamplings(nbSamplings, nbSamples, sampling_names, descriptorName, J, Q, pertinenceFunction, bird_search_mode, birdConfidenceLimit = bird_confidence_limit, verbose = True)
         for sampling_name in sampling_names:
             average_birds[sampling_name][k] = np.mean(nbBirdsArrays[sampling_name])
     
-    total_number_of_birds = len(get_all_birds(root, bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit))
-    plt.figure(figsize=(10, 5))
-    for samplingIndex ,sampling_name in enumerate(sampling_names):
+    total_number_of_birds = len(get_all_birds(birdRoot, bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit))
+    plt.figure(figsize = (10, 5))
+    for samplingIndex, sampling_name in enumerate(sampling_names):
 
         plt.plot(nbSamplesList ,average_birds[sampling_name], color = c[samplingIndex])
 
@@ -285,9 +282,9 @@ def displayOracleGraph(sampling_names, nbSamplesList, nbSamplings, bird_search_m
         plt.ylabel("Number of birds")
 
     endOfGraph = np.minimum(nbSamplesList[-1], total_number_of_birds)
+
     # Affchage de la courbe de l'oracle
     plt.plot(np.linspace(nbSamplesList[0], nbSamplesList[-1], nbSamplesList[-1] - nbSamplesList[0] +1), np.concatenate([np.linspace(nbSamplesList[0], endOfGraph, endOfGraph - nbSamplesList[0] +1) , [total_number_of_birds]*(np.maximum(0 , nbSamplesList[-1] - total_number_of_birds))]), color = 'r', linestyle = ':')
-
 
     patch = []
     for k, color in enumerate(c):
@@ -499,92 +496,94 @@ def computeBestOfN(samplingNames, average_pertinences, average_diversities, crit
 
 # Display birds over time
 
-def displayBirdsOverTime(root, bird_search_mode, bird_confidence_limit, numberOfHours = 1, withPertinenceCurve = True, displayBirdsGraphToo = True, windowLenghthForPertinence = 5):
+def displayBirdsOverTime(soundsRoot, bird_search_mode, bird_confidence_limit, numberOfHours = 1, withPertinenceCurve = True, displayBirdsGraphToo = True, windowLenghthForPertinence = 5):
     
-    for root, dirnames, filenames in os.walk(root):
-        days = []
-        hours = []
-        distinctHours = set()
-        for filename in filenames:
-            currentDay, currentHour = getDateFromFilename(filename).split(' ')
-            days.append(currentDay)
-            hours.append(currentHour)
-            distinctHours = distinctHours.union(currentHour.split(':'))
-        setOfDays = set(days)
-        indicesOfDays = []
-        for i, distinctDay in enumerate(setOfDays):
-            indicesOfDays.append(list(filter(lambda x: days[x] == distinctDay, range(len(days)))))
-        timesOfDays = []
-        for indicesOfDay in indicesOfDays:
-            timesOfDays.append([hours[i] for i in indicesOfDay])
-        hoursPerDay = []
-        for distinctHour in distinctHours:
-            for timeOfDay in timesOfDays:
-                hoursPerDay.append(len([i for i in timeOfDay if i.split(':')[0] == distinctHour]))
-        
-        startOfRange = 0
-        numberOfBirdsPerHour = []
-        for i in range(len(hoursPerDay) // numberOfHours):
-            numberOfBirdsPerHour.append(len(extract_birds(filenames[startOfRange : startOfRange + hoursPerDay[i]*numberOfHours], root = './BirdNET', bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)))
-            startOfRange = startOfRange + hoursPerDay[i]*numberOfHours
-        if(withPertinenceCurve):
-            displayPertinences(pertinenceFunction = 'identity', samples = [], windowLenghth = windowLenghthForPertinence)
-        q = getPertinences(verbose = False, pertinenceFunction = 'identity', windowLenghth = windowLenghthForPertinence)
+    days = []
+    hours = []
+    distinctHours = set()
 
-        #q = q.reshape(-1,4).mean(axis = 1)
-        newSize = len(q)/len(numberOfBirdsPerHour)
-        dates = ['midnight', 'noon', 'midnight', 'noon', 'midnight', 'noon', 'midnight']
-        if(displayBirdsGraphToo):
-            plt.figure(figsize = (15, 7))
-            ax = plt.axes()
-            plt.plot(numberOfBirdsPerHour)
-            plt.xticks([len(numberOfBirdsPerHour)/(6) * k for k in range(7)], dates)
-            plt.vlines([len(numberOfBirdsPerHour)/(3) * k for k in range(4)], 0, max(numberOfBirdsPerHour), 'g', ':')
-            plt.xticks(rotation=45)
-            plt.ylabel("Number of birds")
-            plt.title("Number of birds over time")
-            plt.show()
-        
-        fig, ax1 = plt.subplots(figsize = (15, 7))
-        numberOfBirdsPerHour = interpolation.zoom(numberOfBirdsPerHour, newSize) # on interpole pour que les deux graphes à afficher aient la meme taille
-        numberOfBirdsPerHour = np.abs(numberOfBirdsPerHour) # l'interpolation donne des nombres negatif parfois
-        color = 'tab:red'
-        ax1.set_ylabel("Number of birds")
-        ax1.plot(numberOfBirdsPerHour)
+    filenames = os.listdir(soundsRoot)
+    for filename in filenames:
+        currentDay, currentHour = getDateFromFilename(filename).split(' ')
+        days.append(currentDay)
+        hours.append(currentHour)
+        distinctHours = distinctHours.union(currentHour.split(':'))
+    
+    setOfDays = set(days)
+    indicesOfDays = []
+    for i, distinctDay in enumerate(setOfDays):
+        indicesOfDays.append(list(filter(lambda x: days[x] == distinctDay, range(len(days)))))
+    timesOfDays = []
+    for indicesOfDay in indicesOfDays:
+        timesOfDays.append([hours[i] for i in indicesOfDay])
+    hoursPerDay = []
+    for distinctHour in distinctHours:
+        for timeOfDay in timesOfDays:
+            hoursPerDay.append(len([i for i in timeOfDay if i.split(':')[0] == distinctHour]))
+    
+    startOfRange = 0
+    numberOfBirdsPerHour = []
+    for i in range(len(hoursPerDay) // numberOfHours):
+        numberOfBirdsPerHour.append(len(extract_birds(filenames[startOfRange : startOfRange + hoursPerDay[i]*numberOfHours], birdRoot = './data/birdNet', bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)))
+        startOfRange = startOfRange + hoursPerDay[i]*numberOfHours
+    if(withPertinenceCurve):
+        displayPertinences(pertinenceFunction = 'identity', samples = [], windowLenghth = windowLenghthForPertinence)
+    q = getPertinences(verbose = False, pertinenceFunction = 'identity', windowLenghth = windowLenghthForPertinence)
+
+    newSize = len(q)/len(numberOfBirdsPerHour)
+    dates = ['midnight', 'noon', 'midnight', 'noon', 'midnight', 'noon', 'midnight']
+    if(displayBirdsGraphToo):
+        plt.figure(figsize = (15, 7))
+        ax = plt.axes()
+        plt.plot(numberOfBirdsPerHour)
         plt.xticks([len(numberOfBirdsPerHour)/(6) * k for k in range(7)], dates)
         plt.vlines([len(numberOfBirdsPerHour)/(3) * k for k in range(4)], 0, max(numberOfBirdsPerHour), 'g', ':')
         plt.xticks(rotation=45)
-        ax2 = ax1.twinx()
-        ax2.plot(q, color = color)
-        ax2.tick_params(axis='y', labelcolor=color)
-        ax2.set_ylabel('Pertinence', color=color)
+        plt.ylabel("Number of birds")
+        plt.title("Number of birds over time")
+        plt.show()
+    
+    fig, ax1 = plt.subplots(figsize = (15, 7))
+    numberOfBirdsPerHour = interpolation.zoom(numberOfBirdsPerHour, newSize) # on interpole pour que les deux graphes à afficher aient la meme taille
+    numberOfBirdsPerHour = np.abs(numberOfBirdsPerHour) # l'interpolation donne des nombres negatif parfois
+    color = 'tab:red'
+    ax1.set_ylabel("Number of birds")
+    ax1.plot(numberOfBirdsPerHour)
+    plt.xticks([len(numberOfBirdsPerHour)/(6) * k for k in range(7)], dates)
+    plt.vlines([len(numberOfBirdsPerHour)/(3) * k for k in range(4)], 0, max(numberOfBirdsPerHour), 'g', ':')
+    plt.xticks(rotation=45)
+    ax2 = ax1.twinx()
+    ax2.plot(q, color = color)
+    ax2.tick_params(axis='y', labelcolor=color)
+    ax2.set_ylabel('Pertinence', color=color)
 
 
 # Display a histogram with pertinences and number of birds
 
-def showPertinenceWithBirdsNumberHistogram(root ,bird_search_mode, bird_confidence_limit, windowLenghthForPertinence):
-    for root, dirnames, filenames in os.walk(root):
-        q = getPertinences(verbose = False, pertinenceFunction = 'identity', windowLenghth = windowLenghthForPertinence)
-        numberOfBirds = []
-        for file in filenames:
-            numberOfBirds.append(len(extract_birds(file, root = './BirdNET', bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)))
-        samplesWithNoBirds = np.where(np.asarray(numberOfBirds) == 0)
-        samplesWithBirds = np.where(np.asarray(numberOfBirds) != 0)
+def showPertinenceWithBirdsNumberHistogram(soundsRoot ,bird_search_mode, bird_confidence_limit, windowLenghthForPertinence):
 
-        plt.figure(figsize = (15, 7))
-        plt.hist([q[samplesWithBirds], q[samplesWithNoBirds]],bins = 15, alpha = 0.9, label = ['samples with birds', 'Samples with no birds'])
-        #plt.hist(q[samplesWithNoBirds],bins = 15, alpha = 0.9, label = 'Samples with no birds')
-        plt.xlabel('Pertinence')
-        plt.ylabel('Number of occurences')
-        plt.legend()
+    q = getPertinences(verbose = False, pertinenceFunction = 'identity', windowLenghth = windowLenghthForPertinence)
+    numberOfBirds = []
+
+    for file in os.listdir(soundsRoot):
+        numberOfBirds.append(len(extract_birds(file, birdRoot = './data/birdNet', bird_search_mode = bird_search_mode, bird_confidence_limit = bird_confidence_limit)))
+    
+    samplesWithNoBirds = np.where(np.asarray(numberOfBirds) == 0)
+    samplesWithBirds = np.where(np.asarray(numberOfBirds) != 0)
+
+    plt.figure(figsize = (15, 7))
+    plt.hist([q[samplesWithBirds], q[samplesWithNoBirds]],bins = 15, alpha = 0.9, label = ['samples with birds', 'Samples with no birds'])
+    plt.xlabel('Pertinence')
+    plt.ylabel('Number of occurences')
+    plt.legend()
 
 
 # AFFICHAGE VALEURS PROPRES DESCRIPTEUR
 
-def displayEigenvalues(nbEigenvalues = 10, descriptorName = 'scalogramStat1', J = 8, Q = 3, root = './SoundDatabase', threshold = 0.9):
+def displayEigenvalues(nbEigenvalues = 10, descriptorName = 'scalogramStat1', J = 8, Q = 3, soundsRoot = './data/sounds', threshold = 0.9):
 
     # Get the eigenvalues
-    descriptors = getDescriptors(descriptorName = descriptorName, J = J, Q = Q, root = root, verbose = False)
+    descriptors = getDescriptors(descriptorName = descriptorName, J = J, Q = Q, soundsRoot = soundsRoot, verbose = False)
     eigenvalues, _ = np.linalg.eig(descriptors.dot(descriptors.T))
     eigenvalues = np.abs(eigenvalues)
     eigenvalues[::-1].sort()
@@ -600,7 +599,7 @@ def displayEigenvalues(nbEigenvalues = 10, descriptorName = 'scalogramStat1', J 
 
 # AFFICHAGE DES SPECTROGRAMMES DES SONS TIRES PAR LES TECHNIQUES D'ECHANTILLONNAGE
 
-def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, height, width, descriptorName, J, Q, pertinenceFunction, root, cmap, title, labelFontSize, labelFontWeight, subtitlesFontSize, subtitlesFontWeight, titleFontSize, titleFontWeight):
+def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, height, width, descriptorName, J, Q, pertinenceFunction, soundsRoot, cmap, title, labelFontSize, labelFontWeight, subtitlesFontSize, subtitlesFontWeight, titleFontSize, titleFontWeight):
 
     # Display spectrograms
 
@@ -611,11 +610,11 @@ def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, hei
 
     for i, samplingFunction in enumerate(samplingFunctions):
 
-        samples, _ = samplingFunction(nbSamples, root = root, descriptorName = descriptorName, J = J, Q = Q, pertinenceFunction = pertinenceFunction)
+        samples, _ = samplingFunction(nbSamples, soundsRoot = soundsRoot, descriptorName = descriptorName, J = J, Q = Q, pertinenceFunction = pertinenceFunction)
 
         for j in range(nbCols):
 
-            sound, fs = getSound(os.path.join(root, samples[j]), 5)
+            sound, fs = getSound(f'{soundsRoot}/{samples[j]}', 5)
 
             displaySpectrogram(sound, fs, "", axs[i, j], xlabel = "", ylabel = "", cmap = cmap)
 
@@ -644,7 +643,7 @@ def displaySamplingsSpectrogram(nbSamples, samplingNames, samplingFunctions, hei
 
 # Show oracle curve for number of birds in samples & number of samples with birds in 
 
-def displayDoubleOracle(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, c, dispParams, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3):
+def displayDoubleOracle(sampling_names, nbSamplesList, nbSamplings, bird_search_mode, bird_confidence_limit, pertinenceFunction, c, dispParams, descriptorName = 'scalogramStat1', J = 8, Q = 3):
     average_birds = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
     average_nbWithBirdsArrays = np.array(np.zeros(len(nbSamplesList)), dtype = [(sampling_name, 'float') for sampling_name in sampling_names])
     

@@ -12,26 +12,26 @@ from utils import getFilenamesAtPositions, extract_birds, numSamplesWithBirds, p
 
 # Echantillonage par pertinence
 
-def sampling_pertinence(nbSamples, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
+def sampling_pertinence(nbSamples, soundsRoot = './data/sounds', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
-    q = getPertinences(verbose = False, pertinenceFunction = pertinenceFunction, root = root)
+    q = getPertinences(verbose = False, pertinenceFunction = pertinenceFunction, soundsRoot = soundsRoot)
 
     nbSounds = len(q)
     
     samplesPositions = np.random.choice(np.arange(0, nbSounds), p = q / np.sum(q), size = nbSamples)
-    samples = getFilenamesAtPositions(root, samplesPositions)
+    samples = getFilenamesAtPositions(soundsRoot, samplesPositions)
 
     criterion = np.mean(q[samplesPositions])
 
     return samples, criterion
 
 
-def sampling_max_pertinence(nbSamples, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
+def sampling_max_pertinence(nbSamples, soundsRoot = './data/sounds', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
-    q = getPertinences(verbose = False, pertinenceFunction = pertinenceFunction, root = root)
+    q = getPertinences(verbose = False, pertinenceFunction = pertinenceFunction, soundsRoot = soundsRoot)
 
     samplesPositions = np.argpartition(q, -nbSamples)[-nbSamples:]
-    samples = getFilenamesAtPositions(root, samplesPositions)
+    samples = getFilenamesAtPositions(soundsRoot, samplesPositions)
 
     criterion = np.mean(q[samplesPositions])
 
@@ -40,29 +40,29 @@ def sampling_max_pertinence(nbSamples, root = './SoundDatabase', descriptorName 
 
 # Echantillonage aleatoire
 
-def sampling_random(nbSamples, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
+def sampling_random(nbSamples, soundsRoot = './data/sounds', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
     nbSounds = 432
 
     samples_positions = np.random.randint(0, high = nbSounds, size = nbSamples)
 
-    samples = getFilenamesAtPositions(root, samples_positions)
+    samples = getFilenamesAtPositions(soundsRoot, samples_positions)
 
     return samples, 0
 
 
 # Echantillonage par K-Means pondéré
 
-def sampling_weighted_kmeans(nbSamples, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
+def sampling_weighted_kmeans(nbSamples, soundsRoot = './data/sounds', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
     descriptor = getDescriptors(verbose = False, descriptorName = descriptorName, J = J, Q = Q)
-    pertinence = getPertinences(pertinenceFunction = pertinenceFunction, root = root, verbose = False)
+    pertinence = getPertinences(pertinenceFunction = pertinenceFunction, soundsRoot = soundsRoot, verbose = False)
 
     kmeans = KMeans(n_clusters = nbSamples, init = 'random', n_init = 1).fit(descriptor, pertinence)
 
     samples_positions, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, descriptor)
 
-    samples = getFilenamesAtPositions(root, samples_positions)
+    samples = getFilenamesAtPositions(soundsRoot, samples_positions)
 
     criterion = kmeans.score(descriptor, pertinence)
 
@@ -71,7 +71,7 @@ def sampling_weighted_kmeans(nbSamples, root = './SoundDatabase', descriptorName
 
 # Echantillonnage par K-means standard
 
-def sampling_kmeans(nbSamples, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
+def sampling_kmeans(nbSamples, soundsRoot = './data/sounds', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
     descriptor = getDescriptors(verbose = False, descriptorName = descriptorName, J = J, Q = Q)
 
@@ -79,7 +79,7 @@ def sampling_kmeans(nbSamples, root = './SoundDatabase', descriptorName = 'scalo
 
     samples_positions, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, descriptor)
 
-    samples = getFilenamesAtPositions(root, samples_positions)
+    samples = getFilenamesAtPositions(soundsRoot, samples_positions)
 
     criterion = kmeans.score(descriptor)
 
@@ -88,7 +88,7 @@ def sampling_kmeans(nbSamples, root = './SoundDatabase', descriptorName = 'scalo
 
 # Echantillonage par DPP
 
-def sampling_dpp(nbSamples, root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
+def sampling_dpp(nbSamples, soundsRoot = './data/sounds', descriptorName = 'scalogramStat1', J = 8, Q = 3, pertinenceFunction = 'identity'):
 
     psi = getpsi(verbose = False, descriptorName = descriptorName, J = J, Q = Q, pertinenceFunction = pertinenceFunction)
 
@@ -96,7 +96,7 @@ def sampling_dpp(nbSamples, root = './SoundDatabase', descriptorName = 'scalogra
 
     samples_positions = DPP.sample_exact_k_dpp(size = nbSamples)
 
-    samples = getFilenamesAtPositions(root, samples_positions)
+    samples = getFilenamesAtPositions(soundsRoot, samples_positions)
 
     det = np.linalg.det(psi[samples_positions].dot(psi[samples_positions].T))
 
@@ -105,25 +105,25 @@ def sampling_dpp(nbSamples, root = './SoundDatabase', descriptorName = 'scalogra
 
 # Calcul d'un echantillonnage
 
-def computeSampling(samplingName, nbSamples, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, root = './SoundDatabase'):
+def computeSampling(samplingName, nbSamples, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, soundsRoot = './data/sounds', birdRoot = './data/birdNet'):
 
     samplings = {'Random': sampling_random, 'Pertinence': sampling_pertinence, 'WeightedK-means': sampling_weighted_kmeans, 'K-means': sampling_kmeans, 'K-DPP': sampling_dpp, 'MaxPertinence': sampling_max_pertinence}
     sampling = samplings[samplingName]
 
-    samples, criterion = sampling(nbSamples, root = root, descriptorName = descriptorName, J = J, Q = Q, pertinenceFunction = pertinenceFunction)
+    samples, criterion = sampling(nbSamples, soundsRoot = soundsRoot, descriptorName = descriptorName, J = J, Q = Q, pertinenceFunction = pertinenceFunction)
 
-    averagePertinences = np.mean(compute_sample_pertinence(samples, root = root, pertinenceFunction = pertinenceFunction))
-    diversity = compute_diversity(samples, root, descriptorName = descriptorName, J = J, Q = Q)
+    averagePertinences = np.mean(compute_sample_pertinence(samples, soundsRoot = soundsRoot, pertinenceFunction = pertinenceFunction))
+    diversity = compute_diversity(samples, soundsRoot, descriptorName = descriptorName, J = J, Q = Q)
 
-    nbBirds = len(extract_birds(samples, './BirdNET', bird_confidence_limit = birdConfidenceLimit, bird_search_mode = birdSearchMode))
-    nbWithBirds = numSamplesWithBirds(samples, './BirdNET', bird_confidence_limit = birdConfidenceLimit, bird_search_mode = birdSearchMode)
+    nbBirds = len(extract_birds(samples, birdRoot = birdRoot, bird_confidence_limit = birdConfidenceLimit, bird_search_mode = birdSearchMode))
+    nbWithBirds = numSamplesWithBirds(samples, birdRoot = birdRoot, bird_confidence_limit = birdConfidenceLimit, bird_search_mode = birdSearchMode)
 
     return samplingName, nbSamples, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, averagePertinences, diversity, nbBirds, nbWithBirds, criterion
 
 
 # Extraction de données depuis la dataframe
 
-def extractSamplings(df, nbSamplings, nbSamples, samplingName, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, verbose):
+def extractSamplings(df, nbSamplings, nbSamples, samplingName, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, verbose, soundsRoot = './data/sounds'):
 
     dfMatchingRows = df.loc[(df['samplingName'] == samplingName) & (df['nbSamples'] == nbSamples) & (df['descriptorName'] == descriptorName) & (df['J'] == J) &(df['Q'] == Q) & (df['pertinenceFunction'] == pertinenceFunction) & (df['birdSearchMode'] == birdSearchMode) & (df['birdConfidenceLimit'] == birdConfidenceLimit)]
     nbMatchingRows = len(dfMatchingRows)
@@ -142,7 +142,7 @@ def extractSamplings(df, nbSamplings, nbSamples, samplingName, descriptorName, J
             if verbose:
                 progressbar(nbMissing - 1, k)
 
-            s_row = pd.Series(computeSampling(samplingName, nbSamples, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit), index = df.columns)
+            s_row = pd.Series(computeSampling(samplingName, nbSamples, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, soundsRoot = soundsRoot), index = df.columns)
             df = df.append(s_row, ignore_index = True)
         
         if verbose:
@@ -161,9 +161,9 @@ def extractSamplings(df, nbSamplings, nbSamples, samplingName, descriptorName, J
 
 # Sauvegarde et extraction des echantillonnages
 
-def getSamplings(nbSamplings, nbSamples, samplingNames, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, verbose = True):
+def getSamplings(nbSamplings, nbSamples, samplingNames, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, verbose = True, soundsRoot = './data/sounds'):
 
-    df = pd.read_csv('./persisted_data/samplings.csv')
+    df = pd.read_csv('./data/samplings.csv')
 
     averagePertinenceArrays = np.array(np.zeros(nbSamplings), dtype = [(samplingName, None) for samplingName in samplingNames])
     diversityArrays = np.array(np.zeros(nbSamplings), dtype = [(samplingName, None) for samplingName in samplingNames])
@@ -172,8 +172,8 @@ def getSamplings(nbSamplings, nbSamples, samplingNames, descriptorName, J, Q, pe
     criterionArrays = np.array(np.zeros(nbSamplings), dtype = [(samplingName, None) for samplingName in samplingNames])
 
     for samplingName in samplingNames:
-        df, averagePertinenceArrays[samplingName], diversityArrays[samplingName], nbBirdsArrays[samplingName], nbWithBirdsArrays[samplingName], criterionArrays[samplingName] = extractSamplings(df, nbSamplings, nbSamples, samplingName, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, verbose)
+        df, averagePertinenceArrays[samplingName], diversityArrays[samplingName], nbBirdsArrays[samplingName], nbWithBirdsArrays[samplingName], criterionArrays[samplingName] = extractSamplings(df, nbSamplings, nbSamples, samplingName, descriptorName, J, Q, pertinenceFunction, birdSearchMode, birdConfidenceLimit, verbose, soundsRoot = soundsRoot)
 
-    df.to_csv('./persisted_data/samplings.csv', index = False)
+    df.to_csv('./data/samplings.csv', index = False)
 
     return averagePertinenceArrays, diversityArrays, nbBirdsArrays, nbWithBirdsArrays, criterionArrays

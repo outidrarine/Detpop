@@ -46,34 +46,29 @@ def compute_pertinence(sound, fe):
     return q
 
 
-def compute_all_pertinence(root, duration = 5, nbSounds = 432):
+def compute_all_pertinence(soundsRoot, duration = 5, nbSounds = 432):
 
     q = np.zeros(nbSounds)
 
-    for _, _, filenames in os.walk(root):
-        for k, f in enumerate(filenames):
-            filename = os.path.join(root, f)
-            sound, fe = getSound(filename, duration)
-            q[k] = compute_pertinence(sound, fe)
-
-    # qmin = np.min(q)
-    # qmax = np.max(q)
-    #q = (q - qmin) / (qmax - qmin)
+    for k, f in enumerate(os.listdir(soundsRoot)):
+        filename = os.path.join(soundsRoot, f)
+        sound, fe = getSound(filename, duration)
+        q[k] = compute_pertinence(sound, fe)
 
     return q
 
 
-def compute_sample_pertinence(samples, root = './SoundDatabase', pertinenceFunction = 'identity'):
+def compute_sample_pertinence(samples, soundsRoot = './data/sounds', pertinenceFunction = 'identity'):
 
-    q = getPertinences(pertinenceFunction = pertinenceFunction, root = root, verbose = False)
-    samplesPositions = getPositionsOfFilenames(root, samples)
+    q = getPertinences(pertinenceFunction = pertinenceFunction, soundsRoot = soundsRoot, verbose = False)
+    samplesPositions = getPositionsOfFilenames(soundsRoot, samples)
 
     return q[samplesPositions]
 
 
-def getPertinences(pertinenceFunction = 'identity', root = './SoundDatabase', verbose = True, windowLenghth = 1):
+def getPertinences(pertinenceFunction = 'identity', soundsRoot = './data/sounds', verbose = True, windowLenghth = 1):
 
-    persisted_pertinences = h5py.File("./persisted_data/pertinences.hdf5", "a")
+    persisted_pertinences = h5py.File("./data/persisted_data/pertinences.hdf5", "a")
 
     pertinences_name = "pertinences"
 
@@ -87,7 +82,7 @@ def getPertinences(pertinenceFunction = 'identity', root = './SoundDatabase', ve
         if verbose:
             print("Creating pertinences matrix and persisting it to a file")
 
-        pertinences = compute_all_pertinence(root = root)
+        pertinences = compute_all_pertinence(soundsRoot = soundsRoot)
         
         persisted_pertinences.create_dataset(pertinences_name, data = pertinences)
 
@@ -105,8 +100,6 @@ def getPertinences(pertinenceFunction = 'identity', root = './SoundDatabase', ve
 # Descripteur
 
 def compute_descriptor(sound, descriptorName, J, Q):
-
-    
     
     if (descriptorName == 'scalogramStat1' or descriptorName == 'scalogramStat2' or descriptorName == 'scalogramStat3' or descriptorName == 'scalogramStat4'):
 
@@ -156,20 +149,19 @@ def compute_descriptor(sound, descriptorName, J, Q):
         raise ValueError(f"descriptorName: expected 'scalogramStat1', 'scalogramStat2', 'scalogramStat3' or 'scalogramStat4' but got '{descriptorName}'")
 
 
-def compute_descriptors(root, descriptorName, J, Q, duration, nbSounds, verbose = True):
+def compute_descriptors(soundsRoot, descriptorName, J, Q, duration, nbSounds, verbose = True):
     
     descriptors = [0] * nbSounds
     
-    for root, _, filenames in os.walk(root):
-        for k, f in enumerate(filenames):
+    for k, f in enumerate(os.listdir(soundsRoot)):
 
-            if verbose:
-                progressbar(nbSounds, k)
-                
-            filename = os.path.join(root, f)
+        if verbose:
+            progressbar(nbSounds, k)
             
-            sound, _ = getSound(filename, duration)
-            descriptors[k] = compute_descriptor(sound, descriptorName, J, Q)
+        filename = os.path.join(soundsRoot, f)
+        
+        sound, _ = getSound(filename, duration)
+        descriptors[k] = compute_descriptor(sound, descriptorName, J, Q)
     
     if verbose:
         print()
@@ -177,9 +169,9 @@ def compute_descriptors(root, descriptorName, J, Q, duration, nbSounds, verbose 
     return np.array(descriptors)
 
 
-def getDescriptors(descriptorName = 'scalogramStat1', J = 8, Q = 3, root = './SoundDatabase', verbose = True):
+def getDescriptors(descriptorName = 'scalogramStat1', J = 8, Q = 3, soundsRoot = './data/sounds', verbose = True):
 
-    persisted_descriptors = h5py.File("./persisted_data/descriptors.hdf5", "a")
+    persisted_descriptors = h5py.File("./data/persisted_data/descriptors.hdf5", "a")
 
     descriptors_name = f"{descriptorName}_{J}_{Q}"
 
@@ -191,7 +183,7 @@ def getDescriptors(descriptorName = 'scalogramStat1', J = 8, Q = 3, root = './So
         if verbose:
             print("Creating descriptors matrix and persisting it to a file")
 
-        descriptors = compute_descriptors(root, descriptorName, J, Q, 5, 432, verbose = verbose) 
+        descriptors = compute_descriptors(soundsRoot, descriptorName, J, Q, 5, 432, verbose = verbose) 
         persisted_descriptors.create_dataset(descriptors_name, data = descriptors)
 
     persisted_descriptors.close()
@@ -201,10 +193,10 @@ def getDescriptors(descriptorName = 'scalogramStat1', J = 8, Q = 3, root = './So
 
 # Psi
 
-def getpsi(descriptorName = 'scalogramStat1', J = 8, Q = 3, verbose = True, root = './SoundDatabase', pertinenceFunction = 'identity'):
+def getpsi(descriptorName = 'scalogramStat1', J = 8, Q = 3, verbose = True, soundsRoot = './data/sounds', pertinenceFunction = 'identity'):
 
-    descriptors = getDescriptors(descriptorName = descriptorName, J = J, Q = Q, root = root, verbose = verbose)
-    pertinences = getPertinences(root = root, pertinenceFunction = pertinenceFunction, verbose = verbose)
+    descriptors = getDescriptors(descriptorName = descriptorName, J = J, Q = Q, soundsRoot = soundsRoot, verbose = verbose)
+    pertinences = getPertinences(soundsRoot = soundsRoot, pertinenceFunction = pertinenceFunction, verbose = verbose)
     
     pertinences = np.tile(pertinences, (descriptors.shape[1], 1)).T
     psi = np.multiply(descriptors, np.sqrt(pertinences))
@@ -214,12 +206,12 @@ def getpsi(descriptorName = 'scalogramStat1', J = 8, Q = 3, verbose = True, root
 
 # Diversité
 
-def compute_diversity(samples, root, descriptorName = 'scalogramStat1', J = 8, Q = 3, withPositions = False):
+def compute_diversity(samples, soundsRoot, descriptorName = 'scalogramStat1', J = 8, Q = 3, withPositions = False):
 
     psi = getpsi(verbose = False, descriptorName = descriptorName, J = J, Q = Q)
 
     if not(withPositions):
-        positions = getPositionsOfFilenames(root, samples)
+        positions = getPositionsOfFilenames(soundsRoot, samples)
     else:
         positions = samples
 
@@ -227,41 +219,3 @@ def compute_diversity(samples, root, descriptorName = 'scalogramStat1', J = 8, Q
     s = abs(np.linalg.det(psi_samples.dot(psi_samples.T)))
 
     return s
-
-
-def diversity_all(root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, nbSounds = 432, verbose = True):
-
-    diversities = np.zeros((nbSounds, nbSounds))
-
-    for j in range(nbSounds):
-        if verbose:
-            progressbar(nbSounds, j)
-        for i in range(nbSounds):
-            diversities[i, j] = compute_diversity([i, j], root, descriptorName = descriptorName, J = J, Q = Q, withPositions = True)
-
-    return diversities
-
-
-def get_all_diversity(root = './SoundDatabase', descriptorName = 'scalogramStat1', J = 8, Q = 3, nbSounds = 432, verbose = True):
-
-    persisted_diversities = h5py.File("./persisted_data/diversities.hdf5", "a")
-
-    diversities_name = f"{descriptorName}_{J}_{Q}"
-
-    if diversities_name in persisted_diversities:
-        if verbose:
-            print("Loading diversities from persisted file")
-        diversities = persisted_diversities[diversities_name][:]
-    else:
-        if verbose:
-            print("Creating diversities and persisting it to a file")
-        diversities = diversity_all(root = root, descriptorName = descriptorName, J = J, Q = Q, nbSounds = nbSounds, verbose = verbose) 
-        persisted_diversities.create_dataset(diversities_name, data = diversities)
-
-    persisted_diversities.close()
-
-    return diversities
-
-
-
-

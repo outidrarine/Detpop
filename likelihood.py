@@ -15,7 +15,7 @@ def randomLikelihood(samples, nbSounds = 432):
 
 # Vraissemblance pour echantillonage par pertinence
 
-def pertinenceLikelihood(samples, pertinenceFunction = 'identity', root = './SoundDatabase'):
+def pertinenceLikelihood(samples, pertinenceFunction = 'identity', root = './data/sounds'):
 
     q = getPertinences(pertinenceFunction = pertinenceFunction, root = root, verbose = False)
 
